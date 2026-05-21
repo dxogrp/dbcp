@@ -30,7 +30,7 @@ DBCP has the following dependencies:
 
 - Python >= 3.12
 - [NumPy](https://numpy.org/doc/stable/index.html) >= 2.3.3
-- [CVXPY](https://www.cvxpy.org/) >= 1.7.3
+- [CVXPY](https://www.cvxpy.org/) >= 1.9
 
 ### Using pip
 
