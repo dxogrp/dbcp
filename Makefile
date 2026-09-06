@@ -14,6 +14,16 @@ sync-examples: ## install development and example dependencies
 	@printf "$(BLUE)Syncing example dependencies...$(RESET)\n"
 	@uv sync --frozen --group dev --group examples
 
+.PHONY: sync-docs
+sync-docs: ## install development and documentation dependencies
+	@printf "$(BLUE)Syncing documentation dependencies...$(RESET)\n"
+	@uv sync --frozen --group dev --group docs
+
+.PHONY: _sync-docs-examples
+_sync-docs-examples:
+	@printf "$(BLUE)Syncing documentation and example dependencies...$(RESET)\n"
+	@uv sync --frozen --group dev --group docs --group examples
+
 .PHONY: marimo
 marimo: sync-examples ## open the Marimo example gallery
 	@printf "$(BLUE)Opening Marimo examples...$(RESET)\n"
@@ -23,6 +33,23 @@ marimo: sync-examples ## open the Marimo example gallery
 check-examples: sync-examples ## statically check every Marimo example
 	@printf "$(BLUE)Checking Marimo examples...$(RESET)\n"
 	@uv run --frozen --group examples marimo check --strict examples/*.py
+
+.PHONY: docs
+docs: _sync-docs-examples ## build and serve the Sphinx documentation
+	@printf "$(BLUE)Building Sphinx documentation...$(RESET)\n"
+	@uv run --frozen --group docs --group examples sphinx-build -b html docs docs/_build/html
+	@printf "$(BLUE)Exporting executed examples; this may take several minutes...$(RESET)\n"
+	@uv run --frozen --group docs --group examples python scripts/export_examples.py \
+		--source-dir examples --output-dir docs/_build/html/examples
+	@printf "$(BLUE)Serving documentation at http://127.0.0.1:8000...$(RESET)\n"
+	@uv run --frozen --group docs --group examples python -m http.server --directory docs/_build/html 8000
+
+.PHONY: check-docs
+check-docs: sync-docs ## strictly validate the Sphinx documentation
+	@printf "$(BLUE)Checking Sphinx documentation...$(RESET)\n"
+	@uv run --frozen --group docs python -m pytest tests/test_docs.py
+	@uv run --frozen --group docs sphinx-build -M clean docs docs/_build
+	@uv run --frozen --group docs sphinx-build -W --keep-going -n -b html docs docs/_build/html
 
 .PHONY: test
 test: sync ## run the full test suite
@@ -49,7 +76,7 @@ build: sync ## build source and wheel distributions
 .PHONY: clean
 clean: ## remove local build and test artifacts
 	@printf "$(BLUE)Cleaning local artifacts...$(RESET)\n"
-	@rm -rf .pytest_cache .ruff_cache build dist src/*.egg-info
+	@rm -rf .pytest_cache .ruff_cache build dist docs/_build src/*.egg-info
 
 .PHONY: help
 help: ## display this help message

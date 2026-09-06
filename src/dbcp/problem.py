@@ -11,30 +11,9 @@ from dbcp.transform import relax_with_slack
 
 
 class BiconvexProblem(cp.Problem):
-    """A biconvex optimization problem class.
+    """A biconvex problem solved by proximal alternating convex search.
 
-    Attributes
-    ----------
-    fix_vars : tuple[Iterable[cp.Variable], Iterable[cp.Variable]]
-        A tuple of two iterables of cvxpy Variables. The first iterable
-        contains the variables to be optimized in the x-problem, and
-        the second iterable contains the variables to be optimized in the y-problem.
-    x_prob : cvxpy.Problem
-        The x-problem with y-variables fixed.
-    y_prob : cvxpy.Problem
-        The y-problem with x-variables fixed.
-    status : str | None
-        The status of the last solve.
-    value : float | None
-        The objective value of the last solve.
-
-    Methods
-    -------
-    solve(solver: str = cp.SCS, lbd: float = 0.1, max_iter: int = 100,
-          gap_tolerance: float = 1e-6, *args, **kwargs) -> float | None
-        Solve the biconvex problem using alternate convex search.
-    is_dbcp() -> bool
-        Check if the problem follows DBCP rules.
+    The supplied variable partition defines the two fixed convex subproblems.
     """
 
     def __init__(
@@ -242,33 +221,10 @@ class BiconvexProblem(cp.Problem):
 
 
 class BiconvexRelaxProblem(cp.Problem):
-    """A biconvex optimization problem class with relaxation.
+    """A slack-relaxed biconvex problem solved by alternating convex search.
 
-    Attributes
-    ----------
-    fix_vars : tuple[Iterable[cp.Variable], Iterable[cp.Variable]]
-        A tuple of two iterables of cvxpy Variables. The first iterable
-        contains the variables to be optimized in the x-problem, and
-        the second iterable contains the variables to be optimized in the y-problem.
-    rlx_prob : cvxpy.Problem
-        The relaxed problem with slack variables added to constraints.
-    x_prob : cvxpy.Problem
-        The relaxed x-problem with y-variables fixed.
-    y_prob : cvxpy.Problem
-        The relaxed y-problem with x-variables fixed.
-    status : str | None
-        The status of the last solve.
-    value : float | None
-        The objective value of the last solve.
-
-    Methods
-    -------
-    solve(solver: str = cp.SCS, lbd: float = 0.1, nu: float = 1,
-          max_iter: int = 100, gap_tolerance: float = 1e-6,
-          slack_tolerance: float = 1e-6, *args, **kwargs) -> float | None
-        Solve the biconvex problem using infeasible start alternate convex search.
-    is_dbcp() -> bool
-        Check if the problem follows DBCP rules.
+    The original constraints receive penalized slack variables so the
+    alternating iterations may begin from an infeasible point.
     """
 
     def __init__(
