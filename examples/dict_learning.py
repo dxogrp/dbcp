@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.17.7"
+__generated_with = "0.24.0"
 app = marimo.App(width="medium")
 
 
@@ -14,7 +14,7 @@ def _(mo):
 
 @app.cell
 def _():
-    import os
+    from pathlib import Path
     import warnings
     warnings.filterwarnings("ignore")
 
@@ -23,19 +23,15 @@ def _():
     import cvxpy as cp
     from dbcp import BiconvexProblem
 
-    import matplotlib as mpl
     import matplotlib.pyplot as plt
-    import seaborn as sns
-    sns.set_theme(style='ticks', font_scale=1.5)
-    mpl.rcParams["text.usetex"] = True
-    mpl.rcParams["mathtext.fontset"] = 'cm'
-    mpl.rcParams['font.family'] = ['sans-serif']
 
-    if not os.path.exists('./figures'):
-        os.makedirs('./figures')
+    _example_directory = Path(__file__).resolve().parent
+    plt.style.use(_example_directory / "zhlatex.mplstyle")
+    figure_directory = _example_directory / "figures"
+    figure_directory.mkdir(parents=True, exist_ok=True)
 
     np.random.seed(10015)
-    return BiconvexProblem, cp, mo, np, plt
+    return BiconvexProblem, cp, figure_directory, mo, np, plt
 
 
 @app.cell(hide_code=True)
@@ -114,14 +110,15 @@ def _(mo):
 
 
 @app.cell
-def _(cards, errs, plt):
-    fig, axs = plt.subplots(1, 1, figsize=(4, 3))
+def _(cards, errs, figure_directory, plt):
+    fig, axs = plt.subplots(1, 1, figsize=(5, 4))
     axs.plot(cards, errs, marker='.', color='k')
-    axs.set_xlabel(r'$\mathop{\bf card} X$')
+    axs.set_xlabel(r'$\mathop{\mathbf{card}} X$')
     axs.set_ylabel('$||DX-Y||_F/||Y||_F$')
 
+    fig.tight_layout()
+    fig.savefig(figure_directory / "dict_learning.pdf", bbox_inches="tight")
     plt.show()
-    fig.savefig('./figures/dict_learning.pdf', bbox_inches='tight')
     return
 
 

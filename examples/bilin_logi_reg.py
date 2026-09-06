@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.17.6"
+__generated_with = "0.24.0"
 app = marimo.App(width="medium")
 
 
@@ -22,14 +22,6 @@ def _():
     import cvxpy as cp
     from sklearn.datasets import make_classification
     from dbcp import BiconvexProblem
-
-    import matplotlib as mpl
-    import matplotlib.pyplot as plt
-    import seaborn as sns
-    sns.set_theme(style='ticks', font_scale=1.5)
-    mpl.rcParams["text.usetex"] = True
-    mpl.rcParams["mathtext.fontset"] = 'cm'
-    mpl.rcParams['font.family'] = ['sans-serif']
 
     np.random.seed(10015)
     return BiconvexProblem, cp, make_classification, mo

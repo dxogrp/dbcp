@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.17.7"
+__generated_with = "0.24.0"
 app = marimo.App(width="medium")
 
 
@@ -14,7 +14,7 @@ def _(mo):
 
 @app.cell
 def _():
-    import os
+    from pathlib import Path
     import warnings
     warnings.filterwarnings("ignore")
 
@@ -23,19 +23,15 @@ def _():
     import cvxpy as cp
     from dbcp import BiconvexProblem, convolve
 
-    import matplotlib as mpl
     import matplotlib.pyplot as plt
-    import seaborn as sns
-    sns.set_theme(style='ticks', font_scale=1.5)
-    mpl.rcParams["text.usetex"] = True
-    mpl.rcParams["mathtext.fontset"] = 'cm'
-    mpl.rcParams['font.family'] = ['sans-serif']
 
-    if not os.path.exists('./figures'):
-        os.makedirs('./figures')
+    _example_directory = Path(__file__).resolve().parent
+    plt.style.use(_example_directory / "zhlatex.mplstyle")
+    figure_directory = _example_directory / "figures"
+    figure_directory.mkdir(parents=True, exist_ok=True)
 
     np.random.seed(10015)
-    return BiconvexProblem, convolve, cp, mo, np, plt
+    return BiconvexProblem, convolve, cp, figure_directory, mo, np, plt
 
 
 @app.cell(hide_code=True)
@@ -135,8 +131,8 @@ def _(mo):
 
 
 @app.cell
-def _(d, np, plt, x, x0, y, y0):
-    fig, axs = plt.subplots(1, 1, figsize=(6, 4))
+def _(d, figure_directory, np, plt, x, x0, y, y0):
+    fig, axs = plt.subplots(1, 1, figsize=(6, 4.5))
     axs.plot(x0, linestyle='--', color='C3', linewidth=2)
     axs.plot(y0, linestyle='--', color='C1', linewidth=2)
     axs.plot(d, linestyle='--', color='k', linewidth=2)
@@ -153,10 +149,11 @@ def _(d, np, plt, x, x0, y, y0):
         "recovered $d$"
     ], frameon=False, fontsize=12)
     axs.set_xlim(0, 60)
-    axs.set_xlabel("indices")
+    axs.set_xlabel("$i$")
 
+    fig.tight_layout()
+    fig.savefig(figure_directory / "blind_deconv.pdf", bbox_inches="tight")
     plt.show()
-    fig.savefig('./figures/blind_deconv.pdf', bbox_inches='tight')
     return
 
 

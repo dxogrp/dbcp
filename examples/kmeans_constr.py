@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.18.3"
+__generated_with = "0.24.0"
 app = marimo.App(width="medium")
 
 
@@ -14,7 +14,7 @@ def _(mo):
 
 @app.cell
 def _():
-    import os
+    from pathlib import Path
     import warnings
     warnings.filterwarnings("ignore")
 
@@ -23,19 +23,14 @@ def _():
     import cvxpy as cp
     from dbcp import BiconvexProblem
 
-    import matplotlib as mpl
     import matplotlib.pyplot as plt
-    import seaborn as sns
-    sns.set_theme(style='ticks', font_scale=1.5)
-    mpl.rcParams["text.usetex"] = True
-    mpl.rcParams["mathtext.fontset"] = 'cm'
-    mpl.rcParams['font.family'] = ['sans-serif']
 
-    if not os.path.exists('./figures'):
-        os.makedirs('./figures')
+    plt.style.use(Path(__file__).resolve().parent / "zhlatex.mplstyle")
+    figure_directory = Path(__file__).resolve().parent / "figures"
+    figure_directory.mkdir(parents=True, exist_ok=True)
 
     np.random.seed(10015)
-    return BiconvexProblem, cp, mo, np, plt
+    return BiconvexProblem, cp, figure_directory, mo, np, plt
 
 
 @app.cell(hide_code=True)
@@ -182,7 +177,7 @@ def _(mo):
 
 
 @app.cell
-def _(mus, plt, xbars, xbars_constr, xs):
+def _(figure_directory, mus, plt, xbars, xbars_constr, xs):
     fig, axs = plt.subplots(1, 1, figsize=(5, 5))
     axs.scatter(xs[:, 0], xs[:, 1], s=20, alpha=0.5)
     axs.scatter(mus[:, 0], mus[:, 1], s=100, color='r', marker='^', label=r'$\mu_i$')
@@ -193,9 +188,10 @@ def _(mus, plt, xbars, xbars_constr, xs):
     axs.set_xlabel('$x_1$')
     axs.set_ylabel('$x_2$')
 
-    plt.legend(frameon=False, handlelength=0.5, loc='upper left')
+    axs.legend(frameon=False, handlelength=0.5, loc='upper left')
+    fig.tight_layout()
+    fig.savefig(figure_directory / "kmeans_constr.pdf", bbox_inches="tight")
     plt.show()
-    fig.savefig('./figures/kmeans_constr.pdf', bbox_inches='tight')
     return
 
 

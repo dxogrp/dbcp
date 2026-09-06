@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.17.6"
+__generated_with = "0.24.0"
 app = marimo.App(width="medium")
 
 
@@ -14,7 +14,7 @@ def _(mo):
 
 @app.cell
 def _():
-    import os
+    from pathlib import Path
     import warnings
     warnings.filterwarnings("ignore")
 
@@ -23,19 +23,15 @@ def _():
     import cvxpy as cp
     from dbcp import BiconvexRelaxProblem
 
-    import matplotlib as mpl
     import matplotlib.pyplot as plt
-    import seaborn as sns
-    sns.set_theme(style='ticks', font_scale=1.5)
-    mpl.rcParams["text.usetex"] = True
-    mpl.rcParams["mathtext.fontset"] = 'cm'
-    mpl.rcParams['font.family'] = ['sans-serif']
 
-    if not os.path.exists('./figures'):
-        os.makedirs('./figures')
+    _example_directory = Path(__file__).resolve().parent
+    plt.style.use(_example_directory / "zhlatex.mplstyle")
+    figure_directory = _example_directory / "figures"
+    figure_directory.mkdir(parents=True, exist_ok=True)
 
     np.random.seed(10015)
-    return BiconvexRelaxProblem, cp, mo, np, plt
+    return BiconvexRelaxProblem, cp, figure_directory, mo, np, plt
 
 
 @app.cell(hide_code=True)
@@ -169,7 +165,7 @@ def _(BiconvexRelaxProblem, K, cp, m, n, xs, ys):
     ]
 
     prob = BiconvexRelaxProblem(obj, ([zs], [thetas]), constr)
-    prob.solve(solver=cp.CLARABEL, nu=1e2, lbd=0.1, gap_tolerance=1e-3)
+    prob.solve(solver=cp.CLARABEL, nu=1e3, lbd=0.1, gap_tolerance=1e-3)
     return thetas, zs
 
 
@@ -182,8 +178,8 @@ def _(mo):
 
 
 @app.cell
-def _(K, coefs, labels, m, np, plt, thetas, zs):
-    fig, axs = plt.subplots(1, 2, figsize=(8, 3), width_ratios=(1.2, 1))
+def _(K, coefs, figure_directory, labels, m, np, plt, thetas, zs):
+    fig, axs = plt.subplots(2, 1, figsize=(6.5, 7))
 
     axs[0].plot(labels, linestyle='dashed', color='k', linewidth=1, zorder=10)
     axs[0].plot(np.argmax(zs.value, axis=-1), color='r', linewidth=2)
@@ -196,16 +192,16 @@ def _(K, coefs, labels, m, np, plt, thetas, zs):
         axs[1].plot(inputs[:, 0], 1 / (1 + np.exp(-inputs @ thetas[_i].value)))
 
     axs[0].set_xlabel('$t$')
-    axs[0].set_ylabel('state')
+    axs[0].set_ylabel(r'$\hat{z}(t)$')
     axs[0].set_yticks([0, 1, 2])
     axs[0].set_yticklabels([1, 2, 3])
 
     axs[1].set_xlabel(r'$x_1$')
-    axs[1].set_ylabel(r'$1/(1 + \exp(-x^T \theta))$', fontsize=15)
+    axs[1].set_ylabel(r'$1/(1 + \exp(-x^T \theta))$')
 
-    plt.tight_layout()
+    fig.tight_layout()
+    fig.savefig(figure_directory / "iohmm.pdf", bbox_inches="tight")
     plt.show()
-    fig.savefig('./figures/iohmm.pdf', bbox_inches='tight')
     return
 
 
