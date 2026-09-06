@@ -19,10 +19,20 @@ install: venv ## install all dependencies using uv
 test: install ## run tests
 	uv run pytest tests
 
+.PHONY: sync-examples
+sync-examples: ## install locked example dependencies
+	@printf "$(BLUE)Installing example dependencies...$(RESET)\n"
+	@uv sync --frozen --group dev --group examples
+
+.PHONY: check-examples
+check-examples: sync-examples ## check Marimo examples
+	@printf "$(BLUE)Checking Marimo examples...$(RESET)\n"
+	@uv run --frozen --group examples marimo check --strict examples
+
 .PHONY: marimo
-marimo: install ## start a Marimo server
+marimo: sync-examples ## start a Marimo server
 	@printf "$(BLUE)Start Marimo server...$(RESET)\n"
-	@uv run --with marimo marimo edit examples
+	@uv run --frozen --group examples marimo edit examples
 
 .PHONY: fmt
 fmt: venv ## Run code formatting and linting

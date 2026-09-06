@@ -230,14 +230,14 @@ prob.solve()
 
 We provide several other examples
 in the [examples](./examples) directory.
-To view and reproduce the examples, executing
+To view and reproduce the examples, run
 
 ```shell
 make marimo
 ```
 
-in the repository folder will install
-and start the [marimo](https://marimo.io/) environment.
+in the repository folder to start
+the [marimo](https://marimo.io/) environment.
 
 ## Citation
 

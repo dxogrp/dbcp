@@ -47,6 +47,11 @@ select = ["E", "F", "I"]
 dev = [
     "pytest>=8.4.2",
 ]
+examples = [
+    "marimo>=0.24.0",
+    "matplotlib>=3.9",
+    "scikit-learn>=1.9",
+]
 
 [tool.pytest.ini_options]
 filterwarnings = [
