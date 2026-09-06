@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>API reference &#8212; DBCP 0.2</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=91272d87" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=b79ff8c9" />
+    <script src="_static/documentation_options.js?v=10f1778b"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script defer="defer" src="_static/version-switcher.js?v=78d03b02"></script>
+    <link rel="canonical" href="https://dxogrp.github.io/dbcp/version/0.2/api.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Release notes" href="release-notes.html" />
+    <link rel="prev" title="Troubleshooting" href="troubleshooting.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">DBCP</a></h1>
+
+
+
+<p class="blurb">Disciplined biconvex programming in Python</p>
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=dxogrp&repo=dbcp&type=star&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modeling.html">Problem modeling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rules.html">DBCP rules and supported expressions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="solving.html">Solving</a></li>
+<li class="toctree-l1"><a class="reference internal" href="results.html">Results and statuses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#modeling-and-solving">Modeling and solving</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#expressions">Expressions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#package-version">Package version</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="release-notes.html">Release notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cite.html">Citing</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><div class="version-switcher" role="navigation" aria-label="Documentation version">
+  <h3>Version</h3>
+  <select
+    id="dbcp-version-select"
+    data-current-version="0.2"
+    data-switcher-url="https://dxogrp.github.io/dbcp/switcher.json"
+    aria-label="Documentation version"
+    hidden
+  >
+    <option value="" selected>0.2</option>
+  </select>
+  <p class="version-switcher-fallback">
+    Release 0.2
+  </p>
+</div>
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section class="tex2jax_ignore mathjax_ignore" id="api-reference">
+<h1>API reference<a class="headerlink" href="#api-reference" title="Link to this heading">¶</a></h1>
+<p>The symbols below are the complete public namespace exported by <code class="docutils literal notranslate"><span class="pre">dbcp</span></code>
+0.2.</p>
+<section id="modeling-and-solving">
+<h2>Modeling and solving<a class="headerlink" href="#modeling-and-solving" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="dbcp.BiconvexProblem">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">dbcp.</span></span><span class="sig-name descname"><span class="pre">BiconvexProblem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">biconvex_objective</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fix_vars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dbcp/problem.html#BiconvexProblem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbcp.BiconvexProblem" title="Link to this definition">¶</a></dt>
+<dd><p>A biconvex problem solved by proximal alternating convex search.</p>
+<p>The supplied variable partition defines the two fixed convex subproblems.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="dbcp.BiconvexProblem.x_prob">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">x_prob</span></span><a class="headerlink" href="#dbcp.BiconvexProblem.x_prob" title="Link to this definition">¶</a></dt>
+<dd><p>The x-problem with y-variables fixed.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="dbcp.BiconvexProblem.y_prob">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">y_prob</span></span><a class="headerlink" href="#dbcp.BiconvexProblem.y_prob" title="Link to this definition">¶</a></dt>
+<dd><p>The y-problem with x-variables fixed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dbcp.BiconvexProblem.solve">
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'SCS'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lbd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap_tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dbcp/problem.html#BiconvexProblem.solve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbcp.BiconvexProblem.solve" title="Link to this definition">¶</a></dt>
+<dd><p>Solve the biconvex problem using alternate convex search.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>solver</strong> (<em>str</em>) – The cvxpy Solver to use for solving the convex subproblems.</p></li>
+<li><p><strong>lbd</strong> (<em>float</em>) – The regularization parameter of the proximal term.</p></li>
+<li><p><strong>max_iter</strong> (<em>int</em>) – The maximum number of ACS iterations.</p></li>
+<li><p><strong>gap_tolerance</strong> (<em>float</em>) – The tolerance for the gap between x- and y-problems.</p></li>
+<li><p><strong>*args, **kwargs</strong> (<em>Additional arguments for the solver.</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="dbcp.BiconvexProblem.status">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">status</span></span><a class="headerlink" href="#dbcp.BiconvexProblem.status" title="Link to this definition">¶</a></dt>
+<dd><p>The status of the last solve.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="dbcp.BiconvexProblem.value">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">value</span></span><a class="headerlink" href="#dbcp.BiconvexProblem.value" title="Link to this definition">¶</a></dt>
+<dd><p>The objective value of the last solve.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dbcp.BiconvexProblem.is_dbcp">
+<span class="sig-name descname"><span class="pre">is_dbcp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dbcp/problem.html#BiconvexProblem.is_dbcp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbcp.BiconvexProblem.is_dbcp" title="Link to this definition">¶</a></dt>
+<dd><p>Check if the problem follows DBCP rules.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="dbcp.BiconvexRelaxProblem">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">dbcp.</span></span><span class="sig-name descname"><span class="pre">BiconvexRelaxProblem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">biconvex_objective</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fix_vars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dbcp/problem.html#BiconvexRelaxProblem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbcp.BiconvexRelaxProblem" title="Link to this definition">¶</a></dt>
+<dd><p>A slack-relaxed biconvex problem solved by alternating convex search.</p>
+<p>The original constraints receive penalized slack variables so the
+alternating iterations may begin from an infeasible point.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="dbcp.BiconvexRelaxProblem.x_prob">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">x_prob</span></span><a class="headerlink" href="#dbcp.BiconvexRelaxProblem.x_prob" title="Link to this definition">¶</a></dt>
+<dd><p>The relaxed x-problem with y-variables fixed.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="dbcp.BiconvexRelaxProblem.y_prob">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">y_prob</span></span><a class="headerlink" href="#dbcp.BiconvexRelaxProblem.y_prob" title="Link to this definition">¶</a></dt>
+<dd><p>The relaxed y-problem with x-variables fixed.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="dbcp.BiconvexRelaxProblem.rlx_prob">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">rlx_prob</span></span><a class="headerlink" href="#dbcp.BiconvexRelaxProblem.rlx_prob" title="Link to this definition">¶</a></dt>
+<dd><p>The relaxed problem with slack variables added to constraints.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dbcp.BiconvexRelaxProblem.solve">
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'SCS'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lbd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap_tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slack_tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dbcp/problem.html#BiconvexRelaxProblem.solve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbcp.BiconvexRelaxProblem.solve" title="Link to this definition">¶</a></dt>
+<dd><p>Solve the biconvex problem using infeasible start alternate convex search.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>solver</strong> (<em>str</em>) – The cvxpy Solver to use for solving the convex subproblems.</p></li>
+<li><p><strong>lbd</strong> (<em>float</em>) – The regularization parameter of the proximal term.</p></li>
+<li><p><strong>nu</strong> (<em>float</em>) – The penalty parameter for the total slackness.</p></li>
+<li><p><strong>max_iter</strong> (<em>int</em>) – The maximum number of ACS iterations.</p></li>
+<li><p><strong>gap_tolerance</strong> (<em>float</em>) – The tolerance for the gap between x- and y-problems.</p></li>
+<li><p><strong>slack_tolerance</strong> (<em>float</em>) – The tolerance for the total slackness.</p></li>
+<li><p><strong>*args, **kwargs</strong> – Additional arguments to pass to the solver.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="dbcp.BiconvexRelaxProblem.status">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">status</span></span><a class="headerlink" href="#dbcp.BiconvexRelaxProblem.status" title="Link to this definition">¶</a></dt>
+<dd><p>The status of the last solve.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="dbcp.BiconvexRelaxProblem.value">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">value</span></span><a class="headerlink" href="#dbcp.BiconvexRelaxProblem.value" title="Link to this definition">¶</a></dt>
+<dd><p>The objective value of the last solve.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dbcp.BiconvexRelaxProblem.is_dbcp">
+<span class="sig-name descname"><span class="pre">is_dbcp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dbcp/problem.html#BiconvexRelaxProblem.is_dbcp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbcp.BiconvexRelaxProblem.is_dbcp" title="Link to this definition">¶</a></dt>
+<dd><p>Check if the problem follows DBCP rules.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="expressions">
+<h2>Expressions<a class="headerlink" href="#expressions" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="dbcp.convolve">
+<span class="sig-prename descclassname"><span class="pre">dbcp.</span></span><span class="sig-name descname"><span class="pre">convolve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dbcp/atoms.html#convolve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbcp.convolve" title="Link to this definition">¶</a></dt>
+<dd><p>Discrete convolution of two 1-D cvxpy expressions.</p>
+<p>Suppose <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(y\)</span> are 1-D cvxpy expressions of lengths
+<span class="math notranslate nohighlight">\(m\)</span> and <span class="math notranslate nohighlight">\(n\)</span>, respectively.
+This function returns a cvxpy expression <span class="math notranslate nohighlight">\(c\)</span> of length <span class="math notranslate nohighlight">\(m + n - 1\)</span>, where</p>
+<div class="math notranslate nohighlight">
+\[c_k = \sum_{i + j = k} x_i y_j,\quad k = 1, \ldots, m + n - 1.\]</div>
+<p>Matches numpy.convolve for 1-D arrays.</p>
+<p>This function extends cvxpy.convolve atom to support the convolution
+operation between two cvxpy expressions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>cp.Expression</em>) – A 1-D cvxpy expression.</p></li>
+<li><p><strong>y</strong> (<em>cp.Expression</em>) – A 1-D cvxpy expression.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The convolution of x and y.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>cp.Expression</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="package-version">
+<h2>Package version<a class="headerlink" href="#package-version" title="Link to this heading">¶</a></h2>
+<dl class="py data">
+<dt class="sig sig-object py" id="dbcp.__version__">
+<span class="sig-prename descclassname"><span class="pre">dbcp.</span></span><span class="sig-name descname"><span class="pre">__version__</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'0.2.3'</span></span><a class="headerlink" href="#dbcp.__version__" title="Link to this definition">¶</a></dt>
+<dd><p>str(object=’’) -&gt; str
+str(bytes_or_buffer[, encoding[, errors]]) -&gt; str</p>
+<p>Create a new string object from the given object. If encoding or
+errors is specified, then the object must expose a data buffer
+that will be decoded using the given encoding and error handler.
+Otherwise, returns the result of object.__str__() (if defined)
+or repr(object).
+encoding defaults to ‘utf-8’.
+errors defaults to ‘strict’.</p>
+</dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &#169;2026, Hao Zhu, Joschka Boedecker, and DBCP contributors.
+      
+      |
+      <a href="_sources/api.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

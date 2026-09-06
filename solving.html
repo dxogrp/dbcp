@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Solving &#8212; DBCP 0.2</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=91272d87" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=b79ff8c9" />
+    <script src="_static/documentation_options.js?v=10f1778b"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script defer="defer" src="_static/version-switcher.js?v=78d03b02"></script>
+    <link rel="canonical" href="https://dxogrp.github.io/dbcp/version/0.2/solving.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Results and statuses" href="results.html" />
+    <link rel="prev" title="DBCP rules and supported expressions" href="rules.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">DBCP</a></h1>
+
+
+
+<p class="blurb">Disciplined biconvex programming in Python</p>
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=dxogrp&repo=dbcp&type=star&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modeling.html">Problem modeling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rules.html">DBCP rules and supported expressions</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Solving</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#proximal-alternating-convex-search">Proximal alternating convex search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#feasible-initialization">Feasible initialization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#infeasible-start-relaxation">Infeasible-start relaxation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#continuing-from-an-existing-point">Continuing from an existing point</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="results.html">Results and statuses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release-notes.html">Release notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cite.html">Citing</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><div class="version-switcher" role="navigation" aria-label="Documentation version">
+  <h3>Version</h3>
+  <select
+    id="dbcp-version-select"
+    data-current-version="0.2"
+    data-switcher-url="https://dxogrp.github.io/dbcp/switcher.json"
+    aria-label="Documentation version"
+    hidden
+  >
+    <option value="" selected>0.2</option>
+  </select>
+  <p class="version-switcher-fallback">
+    Release 0.2
+  </p>
+</div>
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section class="tex2jax_ignore mathjax_ignore" id="solving">
+<h1>Solving<a class="headerlink" href="#solving" title="Link to this heading">¶</a></h1>
+<section id="proximal-alternating-convex-search">
+<h2>Proximal alternating convex search<a class="headerlink" href="#proximal-alternating-convex-search" title="Link to this heading">¶</a></h2>
+<p>Let <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(y\)</span> denote the two variable blocks. Given the current point
+<span class="math notranslate nohighlight">\((x^k,y^k)\)</span>, DBCP alternates between convex subproblems of the schematic form</p>
+<div class="math notranslate nohighlight">
+\[
+x^{k+1}\in\mathop{\rm argmin}_x
+f_0(x,y^k)+\lambda\|x-x^k\|_F^2
+\]</div>
+<p>and</p>
+<div class="math notranslate nohighlight">
+\[
+y^{k+1}\in\mathop{\rm argmin}_y
+f_0(x^{k+1},y)+\lambda\|y-y^k\|_F^2,
+\]</div>
+<p>with the analogous sign adjustment for a maximization objective. The
+regularization parameter is the <code class="docutils literal notranslate"><span class="pre">lbd</span></code> solve argument. The proximal terms make
+each half-step prefer points near the preceding iterate.</p>
+<p>After each pair of solves, DBCP evaluates the two fixed-subproblem objectives
+without their proximal terms. For a direct problem, these are the original
+objective; for a relaxed problem, they also contain the weighted slack penalty.
+DBCP stops when their absolute difference is below <code class="docutils literal notranslate"><span class="pre">gap_tolerance</span></code>, or after
+<code class="docutils literal notranslate"><span class="pre">max_iter</span></code> iterations.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">value</span> <span class="o">=</span> <span class="n">problem</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span>
+    <span class="n">solver</span><span class="o">=</span><span class="n">cp</span><span class="o">.</span><span class="n">CLARABEL</span><span class="p">,</span>
+    <span class="n">lbd</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">max_iter</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+    <span class="n">gap_tolerance</span><span class="o">=</span><span class="mf">1e-7</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>The default solver is <code class="docutils literal notranslate"><span class="pre">cp.SCS</span></code>, <code class="docutils literal notranslate"><span class="pre">lbd=0.1</span></code>, <code class="docutils literal notranslate"><span class="pre">max_iter=100</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">gap_tolerance=1e-6</span></code>. Additional positional and keyword arguments are passed
+to CVXPY’s <code class="docutils literal notranslate"><span class="pre">Problem.solve()</span></code> calls.</p>
+<p>For a relaxed problem, <code class="docutils literal notranslate"><span class="pre">nu=1</span></code> and <code class="docutils literal notranslate"><span class="pre">slack_tolerance=1e-6</span></code> by default.</p>
+<p>Alternating convex search is a local heuristic. A small objective gap is the
+package’s termination test, not a certificate of global optimality.</p>
+</section>
+<section id="feasible-initialization">
+<h2>Feasible initialization<a class="headerlink" href="#feasible-initialization" title="Link to this heading">¶</a></h2>
+<p>Before a direct <a class="reference internal" href="api.html#dbcp.BiconvexProblem" title="dbcp.BiconvexProblem"><code class="xref py py-class docutils literal notranslate"><span class="pre">dbcp.BiconvexProblem</span></code></a> solve, every unset variable is
+randomly initialized and projected through its CVXPY attributes. If all
+constraints are satisfied, ACS starts immediately.</p>
+<p>Otherwise, DBCP adds temporary slacks to the constraints and alternately
+minimizes their total one-norm until the original constraints are satisfied.
+If this search cannot find a feasible point within its internal iteration
+limit, it raises <code class="docutils literal notranslate"><span class="pre">dbcp.error.InitiationError</span></code>.</p>
+<p>Supplying feasible <code class="docutils literal notranslate"><span class="pre">.value</span></code> arrays before solving avoids random initialization
+and can improve repeatability.</p>
+</section>
+<section id="infeasible-start-relaxation">
+<h2>Infeasible-start relaxation<a class="headerlink" href="#infeasible-start-relaxation" title="Link to this heading">¶</a></h2>
+<p><a class="reference internal" href="api.html#dbcp.BiconvexRelaxProblem" title="dbcp.BiconvexRelaxProblem"><code class="xref py py-class docutils literal notranslate"><span class="pre">dbcp.BiconvexRelaxProblem</span></code></a> keeps constraint slacks in both alternating
+subproblems. For minimization it solves a penalized objective of the form</p>
+<div class="math notranslate nohighlight">
+\[
+f_0(x,y)+\nu\sum_i\|s_i\|_1,
+\]</div>
+<p>while maximization subtracts the same penalty. Set <code class="docutils literal notranslate"><span class="pre">nu</span></code> in <code class="docutils literal notranslate"><span class="pre">solve()</span></code>; a larger
+value places more emphasis on satisfying the original constraints.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">value</span> <span class="o">=</span> <span class="n">problem</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span>
+    <span class="n">solver</span><span class="o">=</span><span class="n">cp</span><span class="o">.</span><span class="n">CLARABEL</span><span class="p">,</span>
+    <span class="n">nu</span><span class="o">=</span><span class="mf">1e3</span><span class="p">,</span>
+    <span class="n">lbd</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">gap_tolerance</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span>
+    <span class="n">slack_tolerance</span><span class="o">=</span><span class="mf">1e-7</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>The final sum of absolute slack values is compared with <code class="docutils literal notranslate"><span class="pre">slack_tolerance</span></code> to
+classify the point as feasible or infeasible. See <a class="reference internal" href="results.html"><span class="doc">Results and statuses</span></a> for every
+status.</p>
+</section>
+<section id="continuing-from-an-existing-point">
+<h2>Continuing from an existing point<a class="headerlink" href="#continuing-from-an-existing-point" title="Link to this heading">¶</a></h2>
+<p>The original CVXPY variables retain their numerical values after a solve.
+Calling <code class="docutils literal notranslate"><span class="pre">solve()</span></code> again therefore starts from the current point. This can be
+useful after an inaccurate termination or after changing an ordinary CVXPY
+parameter, the iteration limit, the proximal weight, or the slack penalty.</p>
+<p>DBCP prints initialization and iteration progress to standard output. Solver
+verbosity and other backend-specific options can be passed through CVXPY’s
+keyword arguments.</p>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &#169;2026, Hao Zhu, Joschka Boedecker, and DBCP contributors.
+      
+      |
+      <a href="_sources/solving.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

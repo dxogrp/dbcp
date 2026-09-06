@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Troubleshooting &#8212; DBCP 0.2</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=91272d87" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=b79ff8c9" />
+    <script src="_static/documentation_options.js?v=10f1778b"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script defer="defer" src="_static/version-switcher.js?v=78d03b02"></script>
+    <link rel="canonical" href="https://dxogrp.github.io/dbcp/version/0.2/troubleshooting.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API reference" href="api.html" />
+    <link rel="prev" title="Examples" href="examples.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">DBCP</a></h1>
+
+
+
+<p class="blurb">Disciplined biconvex programming in Python</p>
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=dxogrp&repo=dbcp&type=star&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modeling.html">Problem modeling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rules.html">DBCP rules and supported expressions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="solving.html">Solving</a></li>
+<li class="toctree-l1"><a class="reference internal" href="results.html">Results and statuses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Troubleshooting</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#is-dbcp-returns-false"><code class="docutils literal notranslate"><span class="pre">is_dbcp()</span></code> returns false</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#feasible-initialization-fails">Feasible initialization fails</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#a-convex-subproblem-fails">A convex subproblem fails</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#the-solve-reaches-the-iteration-limit">The solve reaches the iteration limit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#a-relaxed-solution-remains-infeasible">A relaxed solution remains infeasible</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cvxpy-reports-a-non-dpp-or-canonicalization-backend-warning">CVXPY reports a non-DPP or canonicalization-backend warning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#convolution-rejects-its-inputs">Convolution rejects its inputs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release-notes.html">Release notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cite.html">Citing</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><div class="version-switcher" role="navigation" aria-label="Documentation version">
+  <h3>Version</h3>
+  <select
+    id="dbcp-version-select"
+    data-current-version="0.2"
+    data-switcher-url="https://dxogrp.github.io/dbcp/switcher.json"
+    aria-label="Documentation version"
+    hidden
+  >
+    <option value="" selected>0.2</option>
+  </select>
+  <p class="version-switcher-fallback">
+    Release 0.2
+  </p>
+</div>
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section class="tex2jax_ignore mathjax_ignore" id="troubleshooting">
+<h1>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Link to this heading">¶</a></h1>
+<section id="is-dbcp-returns-false">
+<h2><code class="docutils literal notranslate"><span class="pre">is_dbcp()</span></code> returns false<a class="headerlink" href="#is-dbcp-returns-false" title="Link to this heading">¶</a></h2>
+<p>Inspect <code class="docutils literal notranslate"><span class="pre">problem.x_prob</span></code> and <code class="docutils literal notranslate"><span class="pre">problem.y_prob</span></code> separately with CVXPY’s
+<code class="docutils literal notranslate"><span class="pre">is_dcp()</span></code> diagnostics. One of the problems still contains a non-DCP
+composition after the opposite variable block has been replaced by
+parameters. Check that every optimization variable is in exactly one supplied
+block and that CVXPY knows any required signs.</p>
+<p>The constructor itself can raise <code class="docutils literal notranslate"><span class="pre">TypeError</span></code> for a specialized constraint
+class that DBCP does not know how to copy. See <a class="reference internal" href="rules.html"><span class="doc">DBCP rules and supported expressions</span></a> for the supported
+families.</p>
+</section>
+<section id="feasible-initialization-fails">
+<h2>Feasible initialization fails<a class="headerlink" href="#feasible-initialization-fails" title="Link to this heading">¶</a></h2>
+<p>A direct solve can raise <code class="docutils literal notranslate"><span class="pre">dbcp.error.InitiationError</span></code> when its alternating
+slack-minimization phase cannot find a point satisfying the original
+constraints. Assign feasible or nearly feasible values to the model variables,
+try another random seed, or use <a class="reference internal" href="api.html#dbcp.BiconvexRelaxProblem" title="dbcp.BiconvexRelaxProblem"><code class="xref py py-class docutils literal notranslate"><span class="pre">dbcp.BiconvexRelaxProblem</span></code></a> when a
+penalized infeasible start is appropriate.</p>
+</section>
+<section id="a-convex-subproblem-fails">
+<h2>A convex subproblem fails<a class="headerlink" href="#a-convex-subproblem-fails" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">dbcp.error.SolveError</span></code> means a fixed convex subproblem failed or returned a
+status other than CVXPY’s <code class="docutils literal notranslate"><span class="pre">optimal</span></code> or <code class="docutils literal notranslate"><span class="pre">optimal_inaccurate</span></code>. Try another
+compatible CVXPY solver, improve scaling or initial values, or increase <code class="docutils literal notranslate"><span class="pre">lbd</span></code>
+to strengthen the proximal regularization.</p>
+</section>
+<section id="the-solve-reaches-the-iteration-limit">
+<h2>The solve reaches the iteration limit<a class="headerlink" href="#the-solve-reaches-the-iteration-limit" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">converge_inaccurate</span></code> means the objective-gap stopping test was not met within
+<code class="docutils literal notranslate"><span class="pre">max_iter</span></code>. Inspect the variable values and objective, then consider another
+starting point, a larger iteration budget, or a different <code class="docutils literal notranslate"><span class="pre">lbd</span></code>. Calling
+<code class="docutils literal notranslate"><span class="pre">solve()</span></code> again continues from the current variable values.</p>
+</section>
+<section id="a-relaxed-solution-remains-infeasible">
+<h2>A relaxed solution remains infeasible<a class="headerlink" href="#a-relaxed-solution-remains-infeasible" title="Link to this heading">¶</a></h2>
+<p>Statuses containing <code class="docutils literal notranslate"><span class="pre">infeasible</span></code> mean the total absolute slack is at least
+<code class="docutils literal notranslate"><span class="pre">slack_tolerance</span></code>. Increase <code class="docutils literal notranslate"><span class="pre">nu</span></code> to penalize slack more heavily, initialize
+closer to the original feasible set, or reconsider whether the constraints are
+jointly feasible.</p>
+</section>
+<section id="cvxpy-reports-a-non-dpp-or-canonicalization-backend-warning">
+<h2>CVXPY reports a non-DPP or canonicalization-backend warning<a class="headerlink" href="#cvxpy-reports-a-non-dpp-or-canonicalization-backend-warning" title="Link to this heading">¶</a></h2>
+<p>DBCP requires each fixed problem to be DCP, but it does not require the
+parameterized problem to be DPP. CVXPY may therefore warn that a parameterized
+subproblem will be canonicalized again or that it selected the SciPy
+canonicalization backend. These warnings concern compilation and performance;
+they do not by themselves mean that <code class="docutils literal notranslate"><span class="pre">is_dbcp()</span></code> should be false. Prefer an
+equivalent DPP formulation when one exists, and select a canonicalization
+backend explicitly only when that choice is intentional.</p>
+</section>
+<section id="convolution-rejects-its-inputs">
+<h2>Convolution rejects its inputs<a class="headerlink" href="#convolution-rejects-its-inputs" title="Link to this heading">¶</a></h2>
+<p><a class="reference internal" href="api.html#dbcp.convolve" title="dbcp.convolve"><code class="xref py py-func docutils literal notranslate"><span class="pre">dbcp.convolve()</span></code></a> accepts only one-dimensional CVXPY expressions. Reshape
+vectors explicitly before calling it; matrices and higher-dimensional arrays
+raise <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>.</p>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &#169;2026, Hao Zhu, Joschka Boedecker, and DBCP contributors.
+      
+      |
+      <a href="_sources/troubleshooting.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
