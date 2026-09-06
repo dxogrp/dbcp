@@ -75,6 +75,6 @@ def test_kmeans():
     obj = cp.sum(cp.multiply(zs, cp.vstack([cp.sum(cp.square(xs - c), axis=1) for c in xbars]).T))
     constr = [zs <= 1, cp.sum(zs, axis=1) == 1]
     prob = BiconvexProblem(cp.Minimize(obj), [[xbars], [zs]], constr)
-    prob.solve()
+    prob.solve(canon_backend=cp.SCIPY_CANON_BACKEND, ignore_dpp=True)
 
     assert xbars.value is not None
