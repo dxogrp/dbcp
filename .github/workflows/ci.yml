@@ -1,0 +1,178 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  test-linux:
+    name: Test (Linux, Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version:
+          - "3.12"
+          - "3.13"
+          - "3.14"
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: uv sync --frozen --group dev
+
+      - name: Run tests
+        run: uv run python -m pytest tests
+
+      - name: Check Marimo examples
+        if: matrix.python-version == '3.13'
+        run: uv run --frozen --group examples marimo check --strict examples
+
+      - name: Run lint checks
+        run: |
+          uv run ruff check .
+          uv run ruff format --check .
+
+      - name: Build package
+        run: uv build
+
+  test-macos:
+    name: Test (macOS, Python ${{ matrix.python-version }})
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version:
+          - "3.12"
+          - "3.13"
+          - "3.14"
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: uv sync --frozen --group dev
+
+      - name: Run tests
+        run: uv run python -m pytest tests
+
+      - name: Check Marimo examples
+        if: matrix.python-version == '3.13'
+        run: uv run --frozen --group examples marimo check --strict examples
+
+      - name: Run lint checks
+        run: |
+          uv run ruff check .
+          uv run ruff format --check .
+
+      - name: Build package
+        run: uv build
+
+  test-windows:
+    name: Test (Windows, Python ${{ matrix.python-version }})
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version:
+          - "3.12"
+          - "3.13"
+          - "3.14"
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+
+      - name: Set up Miniforge
+        uses: conda-incubator/setup-miniconda@8ee1f361103df19b6f8c8655fd3967a8ecb162d5 # v4.0.1
+        with:
+          activate-environment: dbcp-ci
+          channels: conda-forge
+          conda-remove-defaults: "true"
+          miniforge-version: "26.3.2-3"
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+        with:
+          enable-cache: true
+          cache-dependency-glob: |
+            uv.lock
+            .github/workflows/ci.yml
+
+      - name: Install native linear algebra runtime
+        shell: pwsh
+        run: |
+          # CVXPY 1.9 pins a SparseDiffPy wheel that expects openblas.dll on Windows.
+          conda install --yes --strict-channel-priority `
+            "libblas=*=*openblas" `
+            "liblapack=*=*openblas"
+
+      - name: Install Python dependencies
+        shell: pwsh
+        run: |
+          $python = Join-Path $env:CONDA_PREFIX "python.exe"
+          $requirements = Join-Path $env:RUNNER_TEMP "dbcp-requirements.txt"
+          uv export --frozen --group dev --no-hashes --output-file $requirements
+          uv pip install --python $python --requirement $requirements
+
+      - name: Verify installed environment
+        shell: pwsh
+        run: |
+          $python = Join-Path $env:CONDA_PREFIX "python.exe"
+          & $python -c "from sparsediffpy import _sparsediffengine"
+          uv pip check --python $python
+
+      - name: Install Marimo example dependencies
+        if: matrix.python-version == '3.13'
+        shell: pwsh
+        run: |
+          $python = Join-Path $env:CONDA_PREFIX "python.exe"
+          $requirements = Join-Path $env:RUNNER_TEMP "dbcp-example-requirements.txt"
+          uv export --frozen --group dev --group examples --no-hashes --output-file $requirements
+          uv pip install --python $python --requirement $requirements
+
+      - name: Run tests
+        shell: pwsh
+        run: python -m pytest tests
+
+      - name: Check Marimo examples
+        if: matrix.python-version == '3.13'
+        shell: pwsh
+        run: |
+          $python = Join-Path $env:CONDA_PREFIX "python.exe"
+          & $python -m marimo check --strict examples
+
+      - name: Run lint checks
+        shell: pwsh
+        run: |
+          ruff check .
+          ruff format --check .
+
+      - name: Build package
+        run: uv build
