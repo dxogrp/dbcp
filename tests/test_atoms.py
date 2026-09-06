@@ -1,6 +1,7 @@
-import pytest
 import cvxpy as cp
 import numpy as np
+import pytest
+
 import dbcp
 
 np.random.seed(10015)

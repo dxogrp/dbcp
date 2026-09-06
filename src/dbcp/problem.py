@@ -1,12 +1,13 @@
 import warnings
 from collections.abc import Iterable
 
-import numpy as np
 import cvxpy as cp
+import numpy as np
 from cvxpy.constraints.constraint import Constraint
+
+from dbcp.error import DBCPError, InitiationError, SolveError
 from dbcp.fix import fix_prob
 from dbcp.transform import relax_with_slack
-from dbcp.error import InitiationError, SolveError, DBCPError
 
 
 class BiconvexProblem(cp.Problem):
@@ -35,11 +36,12 @@ class BiconvexProblem(cp.Problem):
     is_dbcp() -> bool
         Check if the problem follows DBCP rules.
     """
+
     def __init__(
-            self,
-            biconvex_objective,
-            fix_vars: tuple[Iterable[cp.Variable], Iterable[cp.Variable]],
-            constraints: list[Constraint] | None = None,
+        self,
+        biconvex_objective,
+        fix_vars: tuple[Iterable[cp.Variable], Iterable[cp.Variable]],
+        constraints: list[Constraint] | None = None,
     ) -> None:
         """Initialize a BiconvexProblem instance.
 
@@ -117,24 +119,19 @@ class BiconvexProblem(cp.Problem):
                     p.project_and_assign([v for v in self.fix_vars[0] if v.id == p.id][0].value)
                 yproj_prob.solve(solver=solver)
 
-                print(
-                    f"{i:<7} {yproj_prob.value:<20.9f}")
+                print(f"{i:<7} {yproj_prob.value:<20.9f}")
                 if all([c.value() for c in self.constraints]):
                     print("-" * 65)
-                    print(f'Found feasible point in {i + 1} iterations.')
+                    print(f"Found feasible point in {i + 1} iterations.")
                     break
                 else:
                     i += 1
                 if i == proj_max_iter:
                     raise InitiationError("Cannot find a feasible point. Try different initial values.")
 
-    def solve(self,
-              solver: str = cp.SCS,
-              lbd: float = 0.1,
-              max_iter: int = 100,
-              gap_tolerance: float = 1e-6,
-              *args, **kwargs
-              ) -> float | None:
+    def solve(
+        self, solver: str = cp.SCS, lbd: float = 0.1, max_iter: int = 100, gap_tolerance: float = 1e-6, *args, **kwargs
+    ) -> float | None:
         """Solve the biconvex problem using alternate convex search.
 
         Parameters
@@ -153,21 +150,39 @@ class BiconvexProblem(cp.Problem):
             raise DBCPError("Problem does not follow DBCP rules.")
 
         print(f"{' DBCP Summary ':=^{85}}")
-        self._project(solver, kwargs.get('proj_max_iter', 10))
+        self._project(solver, kwargs.get("proj_max_iter", 10))
 
         print(f"Alternate convex search start with solver {solver}...")
         print("-" * 65)
         print(f"{'iter':<7} {'xcost':<20} {'ycost':<20} {'gap':<10}")
         print("-" * 65)
         prox_params = [cp.Parameter(v.shape, id=v.id, **v.attributes) for v in self.variables()]
-        x_prox = cp.Problem(cp.Minimize(cp.multiply(lbd, cp.sum([
-            cp.sum_squares([p for p in prox_params if p.id == v.id][0] - v)
-            for v in self.x_prob.variables()
-        ]))))
-        y_prox = cp.Problem(cp.Minimize(cp.multiply(lbd, cp.sum([
-            cp.sum_squares([p for p in prox_params if p.id == v.id][0] - v)
-            for v in self.y_prob.variables()
-        ]))))
+        x_prox = cp.Problem(
+            cp.Minimize(
+                cp.multiply(
+                    lbd,
+                    cp.sum(
+                        [
+                            cp.sum_squares([p for p in prox_params if p.id == v.id][0] - v)
+                            for v in self.x_prob.variables()
+                        ]
+                    ),
+                )
+            )
+        )
+        y_prox = cp.Problem(
+            cp.Minimize(
+                cp.multiply(
+                    lbd,
+                    cp.sum(
+                        [
+                            cp.sum_squares([p for p in prox_params if p.id == v.id][0] - v)
+                            for v in self.y_prob.variables()
+                        ]
+                    ),
+                )
+            )
+        )
         if self.objective.NAME == "minimize":
             xprox_prob = self.x_prob + x_prox
             yprox_prob = self.y_prob + y_prox
@@ -186,12 +201,12 @@ class BiconvexProblem(cp.Problem):
                 yprox_prob.solve(solver=solver, *args, **kwargs)
                 yvalue = self.y_prob.objective.value
 
-                if ((xprox_prob.status not in (cp.OPTIMAL, cp.OPTIMAL_INACCURATE)) or
-                        (yprox_prob.status not in (cp.OPTIMAL, cp.OPTIMAL_INACCURATE))):
+                if (xprox_prob.status not in (cp.OPTIMAL, cp.OPTIMAL_INACCURATE)) or (
+                    yprox_prob.status not in (cp.OPTIMAL, cp.OPTIMAL_INACCURATE)
+                ):
                     raise SolveError(f"Solver {solver} failed. Try a different solver.")
                 gap = np.abs(xvalue - yvalue)
-                print(
-                    f"{i:<7} {xvalue:<20.9f} {yvalue:<20.9f} {gap:<10.4e}")
+                print(f"{i:<7} {xvalue:<20.9f} {yvalue:<20.9f} {gap:<10.4e}")
                 if gap < gap_tolerance:
                     self._status = "converge"
                     break
@@ -255,11 +270,12 @@ class BiconvexRelaxProblem(cp.Problem):
     is_dbcp() -> bool
         Check if the problem follows DBCP rules.
     """
+
     def __init__(
-            self,
-            biconvex_objective,
-            fix_vars: tuple[Iterable[cp.Variable], Iterable[cp.Variable]],
-            constraints: list[Constraint] | None = None,
+        self,
+        biconvex_objective,
+        fix_vars: tuple[Iterable[cp.Variable], Iterable[cp.Variable]],
+        constraints: list[Constraint] | None = None,
     ) -> None:
         """Initialize a BiconvexRelaxProblem instance.
 
@@ -320,15 +336,17 @@ class BiconvexRelaxProblem(cp.Problem):
                     p.project_and_assign(var.value)
         return self._y_prob
 
-    def solve(self,
-              solver: str = cp.SCS,
-              lbd: float = 0.1,
-              nu: float = 1,
-              max_iter: int = 100,
-              gap_tolerance: float = 1e-6,
-              slack_tolerance: float = 1e-6,
-              *args, **kwargs
-              ) -> float | None:
+    def solve(
+        self,
+        solver: str = cp.SCS,
+        lbd: float = 0.1,
+        nu: float = 1,
+        max_iter: int = 100,
+        gap_tolerance: float = 1e-6,
+        slack_tolerance: float = 1e-6,
+        *args,
+        **kwargs,
+    ) -> float | None:
         """Solve the biconvex problem using infeasible start alternate convex search.
 
         Parameters
@@ -361,14 +379,34 @@ class BiconvexRelaxProblem(cp.Problem):
                 v.project_and_assign(np.random.standard_normal(v.shape))
         slack_ids = sorted([s.id for s in self.slack_vars])
         prox_params = [cp.Parameter(v.shape, id=v.id, **v.attributes) for v in self.variables()]
-        x_prox = cp.Problem(cp.Minimize(cp.multiply(lbd, cp.sum([
-            cp.sum_squares([p for p in prox_params if p.id == v.id][0] - v)
-            for v in self.x_prob.variables() if v.id not in slack_ids
-        ]))))
-        y_prox = cp.Problem(cp.Minimize(cp.multiply(lbd, cp.sum([
-            cp.sum_squares([p for p in prox_params if p.id == v.id][0] - v)
-            for v in self.y_prob.variables() if v.id not in slack_ids
-        ]))))
+        x_prox = cp.Problem(
+            cp.Minimize(
+                cp.multiply(
+                    lbd,
+                    cp.sum(
+                        [
+                            cp.sum_squares([p for p in prox_params if p.id == v.id][0] - v)
+                            for v in self.x_prob.variables()
+                            if v.id not in slack_ids
+                        ]
+                    ),
+                )
+            )
+        )
+        y_prox = cp.Problem(
+            cp.Minimize(
+                cp.multiply(
+                    lbd,
+                    cp.sum(
+                        [
+                            cp.sum_squares([p for p in prox_params if p.id == v.id][0] - v)
+                            for v in self.y_prob.variables()
+                            if v.id not in slack_ids
+                        ]
+                    ),
+                )
+            )
+        )
         if self.objective.NAME == "minimize":
             xprox_prob = self.x_prob + x_prox
             yprox_prob = self.y_prob + y_prox
@@ -390,18 +428,13 @@ class BiconvexRelaxProblem(cp.Problem):
                 yprox_prob.solve(solver=solver, *args, **kwargs)
                 yvalue = self.y_prob.objective.value
 
-                if ((xprox_prob.status not in (cp.OPTIMAL, cp.OPTIMAL_INACCURATE)) or
-                        (yprox_prob.status not in (cp.OPTIMAL, cp.OPTIMAL_INACCURATE))):
+                if (xprox_prob.status not in (cp.OPTIMAL, cp.OPTIMAL_INACCURATE)) or (
+                    yprox_prob.status not in (cp.OPTIMAL, cp.OPTIMAL_INACCURATE)
+                ):
                     raise SolveError(f"Solver {solver} failed. Try a different solver.")
                 gap = np.abs(xvalue - yvalue)
                 total_slack = np.sum([np.sum(np.abs(s.value)) for s in self.slack_vars])
-                print(
-                    f"{i:<7} "
-                    f"{xvalue:<20.9f} "
-                    f"{yvalue:<20.9f} "
-                    f"{gap:<20.4e} "
-                    f"{total_slack:<20.4e} "
-                )
+                print(f"{i:<7} {xvalue:<20.9f} {yvalue:<20.9f} {gap:<20.4e} {total_slack:<20.4e} ")
                 if gap < gap_tolerance:
                     if total_slack < slack_tolerance:
                         self._status = "converge"
@@ -423,10 +456,11 @@ class BiconvexRelaxProblem(cp.Problem):
         print(f"Terminated with status: {self.status}.")
         print("=" * 85)
         self._value = self.objective.value
-        if 'infeasible' in self.status:
+        if "infeasible" in self.status:
             warnings.warn(
                 f"The returned solution is infeasible with total constraint violation {total_slack}."
-                f"Consider increasing 'nu' value or trying another initial point.")
+                f"Consider increasing 'nu' value or trying another initial point."
+            )
         return self.value
 
     @property

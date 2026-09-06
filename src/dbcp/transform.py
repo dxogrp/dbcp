@@ -1,14 +1,14 @@
-import numpy as np
 import cvxpy as cp
-from cvxpy.constraints.nonpos import Inequality, NonPos, NonNeg
-from cvxpy.constraints.zero import Equality, Zero
+import numpy as np
+from cvxpy.constraints.nonpos import Inequality, NonNeg, NonPos
 from cvxpy.constraints.psd import PSD
 from cvxpy.constraints.second_order import SOC
+from cvxpy.constraints.zero import Equality, Zero
 
 
 def relax_with_slack(
-        prob: cp.Problem,
-        nu: cp.Parameter = None,
+    prob: cp.Problem,
+    nu: cp.Parameter = None,
 ) -> (cp.Problem, list[cp.Variable]):
     proj_constr = []
     slack_vars = []
@@ -37,7 +37,7 @@ def relax_with_slack(
         else:
             raise TypeError(f"Constraint type {type(c)} not supported.")
     if nu is not None:
-        if prob.objective.NAME == 'minimize':
+        if prob.objective.NAME == "minimize":
             proj_obj = prob.objective + cp.Minimize(nu * cp.sum([cp.norm1(s) for s in slack_vars]))
         else:
             proj_obj = prob.objective - cp.Minimize(nu * cp.sum([cp.norm1(s) for s in slack_vars]))

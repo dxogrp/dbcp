@@ -1,6 +1,6 @@
-import pytest
-import numpy as np
 import cvxpy as cp
+import numpy as np
+
 import dbcp
 
 np.random.seed(10015)
@@ -25,5 +25,5 @@ def test_psd():
 
     prob.solve()
     assert constr[0].value()
-    reconstruction_error = np.linalg.norm(A - X.value @ Y.value, 'fro') ** 2
+    reconstruction_error = np.linalg.norm(A - X.value @ Y.value, "fro") ** 2
     assert reconstruction_error < 1e-1

@@ -42,27 +42,24 @@ pip install dbcp
 
 ### Development setup
 
-We manage dependencies through [uv](https://docs.astral.sh/uv).
-Once you have installed uv you can perform the following
-commands to set up a development environment:
+DBCP manages its development environment with [uv](https://docs.astral.sh/uv/).
+Before setting up the repository, install uv.
 
 1. Clone the repository:
 
     ```shell
-    git clone https://github.com/nrgrp/dbcp.git
+    git clone https://github.com/dxogrp/dbcp.git
     cd dbcp
     ```
 
-2. Create a virtual environment and install dependencies:
+2. Create the virtual environment and install the locked development
+   dependencies:
 
     ```shell
-    make install
+    make sync
     ```
 
-This will:
-
-- Create a Python 3.12 virtual environment.
-- Install all dependencies from pyproject.toml.
+Run `make test` and `make lint` before contributing changes.
 
 ## Usage
 
@@ -219,8 +216,8 @@ X = cp.Variable((m, k), nonneg=True)
 Y = cp.Variable((k, n), nonneg=True)
 Z = cp.Variable((m, n))
 
-obj = cp.Minimize(cp.norm(X @ Y + Z - A, 'fro'))
-constraints = [cp.norm(Z, 'fro') <= 1]
+obj = cp.Minimize(cp.norm(X @ Y + Z - A, "fro"))
+constraints = [cp.norm(Z, "fro") <= 1]
 prob = dbcp.BiconvexProblem(obj, [[X], [Y]], constraints)
 
 prob.solve()
@@ -228,16 +225,21 @@ prob.solve()
 
 ### Other examples
 
-We provide several other examples
-in the [examples](./examples) directory.
-To view and reproduce the examples, run
+We provide several other examples in the [examples](./examples) directory.
+Install their locked dependencies and check every notebook with
+
+```shell
+make sync-examples
+make check-examples
+```
+
+To open the notebooks in your browser, run
 
 ```shell
 make marimo
 ```
 
-in the repository folder to start
-the [marimo](https://marimo.io/) environment.
+in the repository folder to start the [Marimo](https://marimo.io/) environment.
 
 ## Citation
 

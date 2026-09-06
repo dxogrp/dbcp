@@ -1,17 +1,14 @@
 from collections.abc import Iterable
 
-import numpy as np
 import cvxpy as cp
-from cvxpy.constraints.nonpos import Inequality, NonPos, NonNeg
-from cvxpy.constraints.zero import Equality, Zero
+import numpy as np
+from cvxpy.constraints.nonpos import Inequality, NonNeg, NonPos
 from cvxpy.constraints.psd import PSD
 from cvxpy.constraints.second_order import SOC
+from cvxpy.constraints.zero import Equality, Zero
 
 
-def fix_prob(
-        prob: cp.Problem,
-        vars: Iterable[cp.Variable]
-) -> cp.Problem:
+def fix_prob(prob: cp.Problem, vars: Iterable[cp.Variable]) -> cp.Problem:
     all_vars = sorted(prob.variables(), key=lambda v: v.id)
     params = []
     for v in all_vars:
@@ -29,17 +26,9 @@ def fix_prob(
         raise TypeError("Object must be a cvxpy Problem.")
 
 
-def _fix_prob(
-        prob: cp.Problem,
-        vars: Iterable[cp.Variable],
-        params: list[cp.Parameter]
-) -> cp.Problem:
+def _fix_prob(prob: cp.Problem, vars: Iterable[cp.Variable], params: list[cp.Parameter]) -> cp.Problem:
     fixed_fn = _fix_expr(prob.objective.expr, vars, params)
-    fixed_obj = (
-        cp.Minimize(fixed_fn)
-        if prob.objective.NAME == "minimize"
-        else cp.Maximize(fixed_fn)
-    )
+    fixed_obj = cp.Minimize(fixed_fn) if prob.objective.NAME == "minimize" else cp.Maximize(fixed_fn)
     fixed_constr = []
     for c in prob.constraints:
         if isinstance(c, Inequality):
@@ -69,9 +58,7 @@ def _fix_prob(
 
 
 def _fix_expr(
-        expr: cp.Expression,
-        vars: Iterable[cp.Variable],
-        params: list[cp.Parameter]
+    expr: cp.Expression, vars: Iterable[cp.Variable], params: list[cp.Parameter]
 ) -> cp.Parameter | cp.Expression:
     vars_id = sorted([v.id for v in vars])
     if isinstance(expr, cp.Variable) and expr.id in vars_id:

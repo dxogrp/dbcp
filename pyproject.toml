@@ -2,17 +2,17 @@
 name = "dbcp"
 version = "0.0.0"
 description = "A CVXPY extension for disciplined biconvex programming."
-authors = [
-    {name = "Hao Zhu", email = "zhuh@cs.uni-freiburg.de"},
-    {name = "Joschka Boedecker"}
-]
 readme = "README.md"
 license = "Apache-2.0"
+authors = [
+    { name = "Hao Zhu", email = "zhuh@cs.uni-freiburg.de" },
+    { name = "Joschka Boedecker" },
+]
 keywords = [
     "convex optimization",
     "disciplined convex programming",
     "biconvex optimization",
-    "disciplined biconvex programming"
+    "disciplined biconvex programming",
 ]
 requires-python = ">=3.12"
 dependencies = [
@@ -21,7 +21,7 @@ dependencies = [
 ]
 
 [project.urls]
-repository = "https://github.com/dxogrp/dbcp"
+Repository = "https://github.com/dxogrp/dbcp"
 
 [build-system]
 requires = ["hatchling"]
@@ -30,22 +30,18 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["src/dbcp"]
 
-[tool.deptry]
-known_first_party = ["dbcp"]
-
-[tool.ruff]
-line-length = 120
-target-version = "py312"
-exclude = [
-    "*__init__.py"
+[tool.hatch.build.targets.sdist]
+only-include = [
+    "src/dbcp",
+    "README.md",
+    "LICENSE",
+    "pyproject.toml",
 ]
-
-[tool.ruff.lint]
-select = ["E", "F", "I"]
 
 [dependency-groups]
 dev = [
-    "pytest>=8.4.2",
+    "pytest>=8.4",
+    "ruff>=0.12",
 ]
 examples = [
     "marimo>=0.24.0",
@@ -53,7 +49,9 @@ examples = [
     "scikit-learn>=1.9",
 ]
 
-[tool.pytest.ini_options]
-filterwarnings = [
-    "ignore::UserWarning",
-]
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
