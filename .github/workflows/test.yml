@@ -29,3 +29,7 @@ jobs:
       - uses: cvxgrp/.github/actions/test@main
         with:
           tests-folder: 'tests'
+
+      - name: "Check Marimo examples"
+        if: matrix.python-version == '3.13'
+        run: uv run --frozen --group examples marimo check --strict examples
