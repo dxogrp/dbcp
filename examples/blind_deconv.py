@@ -14,16 +14,17 @@ def _(mo):
 
 @app.cell
 def _():
-    from pathlib import Path
     import warnings
+    from pathlib import Path
+
     warnings.filterwarnings("ignore")
 
-    import marimo as mo
-    import numpy as np
     import cvxpy as cp
-    from dbcp import BiconvexProblem, convolve
-
+    import marimo as mo
     import matplotlib.pyplot as plt
+    import numpy as np
+
+    from dbcp import BiconvexProblem, convolve
 
     _example_directory = Path(__file__).resolve().parent
     plt.style.use(_example_directory / "zhlatex.mplstyle")
@@ -39,10 +40,13 @@ def _(mo):
     mo.md(r"""
     ## Introduction
 
-    Blind deconvolution is a technique used to recover some sharp signal or image from a blurred observation when the blur itself is unknown.
+    Blind deconvolution is a technique used to recover some sharp signal or image from a blurred observation
+    when the blur itself is unknown.
     It jointly estimates both the original signal and the blur kernel, with some prior knowledge about their structures.
 
-    Suppose we are given a data vector $d \in \mathbf{R}^{m + n - 1}$, which is the convolution of an unknown sparse signal $x \in \mathbf{R}^n$ and an unknown smooth vector $y \in \mathbf{R}^m$ with bounded $\ell_\infty$-norm (i.e., bounded largest entry).
+    Suppose we are given a data vector $d \in \mathbf{R}^{m + n - 1}$, which is the convolution of an unknown
+    sparse signal $x \in \mathbf{R}^n$ and an unknown smooth vector $y \in \mathbf{R}^m$ with bounded
+    $\ell_\infty$-norm (i.e., bounded largest entry).
     Additionally, we have the prior knowledge that both the vectors $x$ and $y$ are nonnegative.
     The corresponding blind deconvolution problem can be formulated as the following biconvex optimization problem:
 
@@ -54,7 +58,9 @@ def _(mo):
         \end{array}
     \]
 
-    with variables $x$ and $y$, where $\alpha_{\rm sp}, \alpha_{\rm sm} > 0$ are the regularization parameters for the sparsity of $x$ and smoothness of $y$, respectively, and $\beta > 0$ is the bound on the $\ell_\infty$-norm of the vector $y$.
+    with variables $x$ and $y$, where $\alpha_{\rm sp}, \alpha_{\rm sm} > 0$ are the regularization parameters
+    for the sparsity of $x$ and smoothness of $y$, respectively, and $\beta > 0$ is the bound on the
+    $\ell_\infty$-norm of the vector $y$.
     The matrix $D \in \mathbf{R}^{(m - 1) \times m}$ is the first-order difference operator, given by,
 
     \[
@@ -113,9 +119,8 @@ def _(BiconvexProblem, convolve, cp, d, m, n):
     x = cp.Variable(n, nonneg=True)
     y = cp.Variable(m, nonneg=True)
     obj = cp.Minimize(
-        cp.sum_squares(convolve(x, y) - d)
-        + alpha_sp * cp.norm1(x)
-        + alpha_sm * cp.sum_squares(cp.diff(y)))
+        cp.sum_squares(convolve(x, y) - d) + alpha_sp * cp.norm1(x) + alpha_sm * cp.sum_squares(cp.diff(y))
+    )
     constr = [cp.norm(y, "inf") <= beta]
     prob = BiconvexProblem(obj, [[x], [y]], constr)
     prob.solve(cp.CLARABEL, gap_tolerance=1e-5, max_iter=200)
@@ -133,21 +138,18 @@ def _(mo):
 @app.cell
 def _(d, figure_directory, np, plt, x, x0, y, y0):
     fig, axs = plt.subplots(1, 1, figsize=(6, 4.5))
-    axs.plot(x0, linestyle='--', color='C3', linewidth=2)
-    axs.plot(y0, linestyle='--', color='C1', linewidth=2)
-    axs.plot(d, linestyle='--', color='k', linewidth=2)
-    axs.plot(x.value, color='C0', marker='.', markersize=10)
-    axs.plot(y.value, color='C2', marker='s')
-    axs.plot(np.convolve(x.value, y.value), marker='D', color='C4', zorder=-1)
+    axs.plot(x0, linestyle="--", color="C3", linewidth=2)
+    axs.plot(y0, linestyle="--", color="C1", linewidth=2)
+    axs.plot(d, linestyle="--", color="k", linewidth=2)
+    axs.plot(x.value, color="C0", marker=".", markersize=10)
+    axs.plot(y.value, color="C2", marker="s")
+    axs.plot(np.convolve(x.value, y.value), marker="D", color="C4", zorder=-1)
 
-    axs.legend([
-        "ground truth $x$",
-        "ground truth $y$",
-        "ground truth $d$",
-        "recovered $x$",
-        "recovered $y$",
-        "recovered $d$"
-    ], frameon=False, fontsize=12)
+    axs.legend(
+        ["ground truth $x$", "ground truth $y$", "ground truth $d$", "recovered $x$", "recovered $y$", "recovered $d$"],
+        frameon=False,
+        fontsize=12,
+    )
     axs.set_xlim(0, 60)
     axs.set_xlabel("$i$")
 

@@ -15,11 +15,13 @@ def _(mo):
 @app.cell
 def _():
     import warnings
+
     warnings.filterwarnings("ignore")
 
+    import cvxpy as cp
     import marimo as mo
     import numpy as np
-    import cvxpy as cp
+
     from dbcp import BiconvexProblem
 
     np.random.seed(10015)
@@ -32,7 +34,13 @@ def _(mo):
     ## Introduction
 
     Suppose we are given a matrix $A \in \mathbf{R}^{m \times n}$, and are interested in solving the problem:
-    $$\begin{array}{ll}\text{minimize} & {\|XY - A\|}_F^2 \\ \text{subject to} & X_{ij} \geq 0,\quad i = 1, \ldots, m,\quad j = 1, \ldots, k \\ & Y_{ij} \geq 0,\quad i = 1, \ldots, k,\quad j = 1, \ldots, n,\end{array}$$
+    $$
+    \begin{array}{ll}
+        \text{minimize} & {\|XY - A\|}_F^2 \\
+        \text{subject to} & X_{ij} \geq 0,\quad i = 1, \ldots, m,\quad j = 1, \ldots, k \\
+        & Y_{ij} \geq 0,\quad i = 1, \ldots, k,\quad j = 1, \ldots, n,
+    \end{array}
+    $$
     where $X \in \mathbf{R}^{m \times k}$ and $Y \in \mathbf{R}^{k \times n}$ are the problem variables.
 
     This problem is biconvex in the variables $X$ and $Y$.

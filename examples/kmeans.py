@@ -14,17 +14,18 @@ def _(mo):
 
 @app.cell
 def _():
-    from pathlib import Path
     import warnings
+    from pathlib import Path
+
     warnings.filterwarnings("ignore")
 
-    import marimo as mo
-    import numpy as np
     import cvxpy as cp
-    from sklearn.datasets import make_blobs
-    from dbcp import BiconvexProblem
-
+    import marimo as mo
     import matplotlib.pyplot as plt
+    import numpy as np
+    from sklearn.datasets import make_blobs
+
+    from dbcp import BiconvexProblem
 
     plt.style.use(Path(__file__).resolve().parent / "zhlatex.mplstyle")
     figure_directory = Path(__file__).resolve().parent / "figures"
@@ -39,7 +40,8 @@ def _(mo):
     mo.md(r"""
     ## Introduction
 
-    Suppose we are given a set of data points $x_i \in \mathbf{R}^n$, $i = 1, \ldots, m$, and we would like to cluster them into $k$ groups, using the $k$-means clustering method.
+    Suppose we are given a set of data points $x_i \in \mathbf{R}^n$, $i = 1, \ldots, m$, and we would like to
+    cluster them into $k$ groups, using the $k$-means clustering method.
     This corresponds to the following biconvex optimization problem:
 
     \[
@@ -52,7 +54,9 @@ def _(mo):
     with variables $\bar{x}_i \in \mathbf{R}^n$, $i = 1, \ldots, k$, and $z_i \in \mathbf{R}^k$, $i = 1, \ldots, m$.
 
     We can interpret the problem formulation as follows:
-    The variables $\bar{x}_1, \ldots, \bar{x}_k$ represent the cluster centroids, and each variable $z_i$ is a soft assignment vector for data point $x_i$, where the $j$th entry of $z_i$ indicates the probability of the sample $x_i$ belonging to cluster $j$.
+    The variables $\bar{x}_1, \ldots, \bar{x}_k$ represent the cluster centroids, and each variable $z_i$ is a soft
+    assignment vector for data point $x_i$, where the $j$th entry of $z_i$ indicates the probability of the sample
+    $x_i$ belonging to cluster $j$.
     Then, the objective function represents the total within-cluster variance, which we would like to minimize.
     """)
     return
@@ -88,9 +92,7 @@ def _(mo):
 def _(BiconvexProblem, cp, k, m, n, xs):
     xbars = cp.Variable((k, n))
     zs = cp.Variable((m, k), nonneg=True)
-    obj = cp.sum(cp.multiply(zs, cp.vstack([
-        cp.sum(cp.square(xs - c), axis=1) for c in xbars
-    ]).T))
+    obj = cp.sum(cp.multiply(zs, cp.vstack([cp.sum(cp.square(xs - c), axis=1) for c in xbars]).T))
     constr = [zs <= 1, cp.sum(zs, axis=1) == 1]
     prob = BiconvexProblem(cp.Minimize(obj), [[xbars], [zs]], constr)
     prob.solve()
@@ -109,11 +111,11 @@ def _(mo):
 def _(figure_directory, np, plt, xbars, xs, zs):
     fig, axs = plt.subplots(1, 1, figsize=(4, 4))
     _labels = np.argmax(zs.value, axis=-1)
-    cmap = plt.get_cmap('tab10', np.unique(_labels).size)
+    cmap = plt.get_cmap("tab10", np.unique(_labels).size)
     axs.scatter(xs[:, 0], xs[:, 1], s=10, c=_labels, cmap=cmap)
-    axs.scatter(xbars.value[:, 0], xbars.value[:, 1], s=100, color='k', marker='x')
-    axs.set_xlabel('$x_1$')
-    axs.set_ylabel('$x_2$')
+    axs.scatter(xbars.value[:, 0], xbars.value[:, 1], s=100, color="k", marker="x")
+    axs.set_xlabel("$x_1$")
+    axs.set_ylabel("$x_2$")
 
     fig.tight_layout()
     fig.savefig(figure_directory / "kmeans.pdf", bbox_inches="tight")

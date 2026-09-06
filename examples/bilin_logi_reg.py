@@ -15,12 +15,14 @@ def _(mo):
 @app.cell
 def _():
     import warnings
+
     warnings.filterwarnings("ignore")
 
+    import cvxpy as cp
     import marimo as mo
     import numpy as np
-    import cvxpy as cp
     from sklearn.datasets import make_classification
+
     from dbcp import BiconvexProblem
 
     np.random.seed(10015)
@@ -32,7 +34,8 @@ def _(mo):
     mo.md(r"""
     ## Introduction
 
-    Suppose we are given a dataset $(X_i, y_i)$, $i = 1, \ldots, m$, where each sample consists of a feature matrix $X_i \in \mathbf{R}^{n \times k}$ and a binary label $y_i \in \{0, 1\}$.
+    Suppose we are given a dataset $(X_i, y_i)$, $i = 1, \ldots, m$, where each sample consists of a feature
+    matrix $X_i \in \mathbf{R}^{n \times k}$ and a binary label $y_i \in \{0, 1\}$.
     Our goal is to construct a bilinear classifier
 
     \[
@@ -42,13 +45,17 @@ def _(mo):
         \end{array}\right.
     \]
 
-    where $U \in \mathbf{R}^{n \times r}$ and $V \in \mathbf{R}^{k \times r}$ are the bilinear logistic regression coefficients with a predefined (maximum) rank $r$, and $\mathop{\bf tr}(M)$ denotes the trace of some square matrix $M$.
+    where $U \in \mathbf{R}^{n \times r}$ and $V \in \mathbf{R}^{k \times r}$ are the bilinear logistic
+    regression coefficients with a predefined (maximum) rank $r$, and $\mathop{\bf tr}(M)$ denotes the trace
+    of some square matrix $M$.
 
-    To fit a bilinear logistic regression model to the dataset, we would like to solve the following bilinear maximum likelihood estimation problem:
+    To fit a bilinear logistic regression model to the dataset, we would like to solve the following bilinear
+    maximum likelihood estimation problem:
 
     \[
         \begin{array}{ll}
-            \text{maximize} & \sum_{i = 1}^{m} y_i \mathop{\bf tr}(U^T X_i V) - \log(1 + \exp(\mathop{\bf tr}(U^T X_i V)))
+            \text{maximize} & \sum_{i = 1}^{m} y_i \mathop{\bf tr}(U^T X_i V)
+            - \log(1 + \exp(\mathop{\bf tr}(U^T X_i V)))
         \end{array}
     \]
 
@@ -73,10 +80,7 @@ def _(make_classification):
     r = 5
     ninfo_frac = 0.9
     Xs, ys = make_classification(
-        n_samples=m,
-        n_features=n * k,
-        n_informative=int(n * k * ninfo_frac),
-        n_redundant=int(n * k * (1 - ninfo_frac))
+        n_samples=m, n_features=n * k, n_informative=int(n * k * ninfo_frac), n_redundant=int(n * k * (1 - ninfo_frac))
     )
     Xs = Xs.reshape(m, n, k)
     return Xs, k, n, r, ys
@@ -97,10 +101,7 @@ def _(BiconvexProblem, Xs, cp, k, n, r, ys):
 
     obj = 0
     for _X, _y in zip(Xs, ys):
-        obj += cp.sum(
-            cp.multiply(_y, cp.trace(U.T @ _X @ V))
-                - cp.logistic(cp.trace(U.T @ _X @ V))
-        )
+        obj += cp.sum(cp.multiply(_y, cp.trace(U.T @ _X @ V)) - cp.logistic(cp.trace(U.T @ _X @ V)))
     prob = BiconvexProblem(cp.Maximize(obj), [[U], [V]])
     prob.solve(cp.CLARABEL, lbd=1, gap_tolerance=1e-4)
     return

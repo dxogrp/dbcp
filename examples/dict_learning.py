@@ -14,16 +14,17 @@ def _(mo):
 
 @app.cell
 def _():
-    from pathlib import Path
     import warnings
+    from pathlib import Path
+
     warnings.filterwarnings("ignore")
 
-    import marimo as mo
-    import numpy as np
     import cvxpy as cp
-    from dbcp import BiconvexProblem
-
+    import marimo as mo
     import matplotlib.pyplot as plt
+    import numpy as np
+
+    from dbcp import BiconvexProblem
 
     _example_directory = Path(__file__).resolve().parent
     plt.style.use(_example_directory / "zhlatex.mplstyle")
@@ -39,7 +40,10 @@ def _(mo):
     mo.md(r"""
     ## Introduction
 
-    We consider the sparse dictionary learning problem, which aims to find a dictionary matrix $D \in \mathbf{R}^{m \times k}$ and a sparse code matrix $X \in \mathbf{R}^{k \times n}$, such that the data matrix $Y \in \mathbf{R}^{m \times n}$ can be well approximated by their product $DX$, while the matrix $X$ is sparse and the matrix $D$ has bounded Frobenius norm.
+    We consider the sparse dictionary learning problem, which aims to find a dictionary matrix
+    $D \in \mathbf{R}^{m \times k}$ and a sparse code matrix $X \in \mathbf{R}^{k \times n}$, such that the data
+    matrix $Y \in \mathbf{R}^{m \times n}$ can be well approximated by their product $DX$, while the matrix $X$
+    is sparse and the matrix $D$ has bounded Frobenius norm.
     The dictionary learning problem can be formulated as the following biconvex optimization problem:
 
     \[
@@ -49,7 +53,8 @@ def _(mo):
         \end{array}
     \]
 
-    with variables $D$ and $X$, where $\alpha > 0$ is the sparsity regularization parameter, and $\beta > 0$ is the bound on the Frobenius norm of the dictionary matrix.
+    with variables $D$ and $X$, where $\alpha > 0$ is the sparsity regularization parameter, and $\beta > 0$
+    is the bound on the Frobenius norm of the dictionary matrix.
     """)
     return
 
@@ -87,7 +92,7 @@ def _(BiconvexProblem, Y, beta, cp, k, m, n, np):
     X = cp.Variable((k, n))
     alpha = cp.Parameter(nonneg=True)
     obj = cp.Minimize(cp.sum_squares(D @ X - Y) + alpha * cp.norm1(X))
-    prob = BiconvexProblem(obj, [[D], [X]], [cp.norm(D,'fro') <= beta])
+    prob = BiconvexProblem(obj, [[D], [X]], [cp.norm(D, "fro") <= beta])
 
     errs = []
     cards = []
@@ -96,7 +101,7 @@ def _(BiconvexProblem, Y, beta, cp, k, m, n, np):
         D.value = None
         X.value = None
         prob.solve(cp.CLARABEL, gap_tolerance=1e-1)
-        errs.append(cp.norm(D @ X - Y, 'fro').value / cp.norm(Y, 'fro').value)
+        errs.append(cp.norm(D @ X - Y, "fro").value / cp.norm(Y, "fro").value)
         cards.append(cp.sum(cp.abs(X).value >= 1e-3).value)
     return cards, errs
 
@@ -112,9 +117,9 @@ def _(mo):
 @app.cell
 def _(cards, errs, figure_directory, plt):
     fig, axs = plt.subplots(1, 1, figsize=(5, 4))
-    axs.plot(cards, errs, marker='.', color='k')
-    axs.set_xlabel(r'$\mathop{\mathbf{card}} X$')
-    axs.set_ylabel('$||DX-Y||_F/||Y||_F$')
+    axs.plot(cards, errs, marker=".", color="k")
+    axs.set_xlabel(r"$\mathbf{card}\,X$")
+    axs.set_ylabel("$||DX-Y||_F/||Y||_F$")
 
     fig.tight_layout()
     fig.savefig(figure_directory / "dict_learning.pdf", bbox_inches="tight")
