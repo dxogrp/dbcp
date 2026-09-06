@@ -1,6 +1,6 @@
 [project]
 name = "dbcp"
-version = "0.0.0"
+version = "0.2.3"
 description = "A CVXPY extension for disciplined biconvex programming."
 readme = "README.md"
 license = "Apache-2.0"
@@ -22,6 +22,7 @@ dependencies = [
 
 [project.urls]
 Repository = "https://github.com/dxogrp/dbcp"
+Documentation = "https://dxogrp.github.io/dbcp/"
 
 [build-system]
 requires = ["hatchling"]
@@ -40,6 +41,7 @@ only-include = [
 
 [dependency-groups]
 dev = [
+    "packaging>=25",
     "pytest>=8.4",
     "ruff>=0.12",
 ]
@@ -47,6 +49,11 @@ examples = [
     "marimo>=0.24.0",
     "matplotlib>=3.9",
     "scikit-learn>=1.9",
+]
+docs = [
+    "alabaster>=1,<2",
+    "myst-parser>=5.1,<6",
+    "sphinx>=9.1,<10",
 ]
 
 [tool.ruff]

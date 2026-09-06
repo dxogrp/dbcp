@@ -1,5 +1,7 @@
 # DBCP: Disciplined Biconvex Programming
 
+[![CI](https://github.com/dxogrp/dbcp/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/dxogrp/dbcp/actions/workflows/ci.yml) [![PyPI](https://img.shields.io/pypi/v/dbcp.svg)](https://pypi.org/project/dbcp/) [![Documentation](https://img.shields.io/badge/docs-latest-blue.svg)](https://dxogrp.github.io/dbcp/) [![License](https://img.shields.io/github/license/dxogrp/dbcp.svg)](https://github.com/dxogrp/dbcp/blob/main/LICENSE)
+
 DBCP is an extension of [CVXPY](https://github.com/cvxpy/cvxpy)
 for (approximately) solving *biconvex optimization problems*
 in the form
@@ -137,7 +139,7 @@ The most important optional arguments of the
 `BiconvexProblem.solve` method are as follows:
 
 - `lbd`: The regularization parameter of the proximal term.
-- `max_iters`: The maximum number of ACS iterations.
+- `max_iter`: The maximum number of ACS iterations.
 - `gap_tolerance`: The tolerance for the gap between the subproblems
   when stopping the ACS procedure.
 
@@ -240,6 +242,26 @@ make marimo
 ```
 
 in the repository folder to start the [Marimo](https://marimo.io/) environment.
+
+Executed, non-interactive versions are available in the
+[published example gallery](https://dxogrp.github.io/dbcp/examples.html).
+
+## Documentation
+
+The complete user guide and API reference are available in the
+[published documentation](https://dxogrp.github.io/dbcp/).
+To build and preview the Sphinx documentation locally, run:
+
+```shell
+make docs
+```
+
+Use `make check-docs` to perform a strict documentation build without
+starting a local server.
+
+## License
+
+DBCP is licensed under the [Apache License 2.0](LICENSE).
 
 ## Citation
 
