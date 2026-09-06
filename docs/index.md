@@ -7,15 +7,15 @@ problem has the form
 $$
 \begin{array}{ll}
 \text{minimize} & f_0(x,y) \\
-\text{subject to} & f_i(x,y) \leq 0, \quad i=1,\ldots,m, \\
+\text{subject to} & f_i(x,y) \leq 0, \quad i=1,\ldots,m\\
 & h_i(x,y)=0, \quad i=1,\ldots,p,
 \end{array}
 $$
 
 where $x\in X$ and $y\in Y$ are the two variable blocks. With $y$ fixed,
-the objective and inequality functions are convex in $x$ and the equality
-functions are affine in $x$. The same conditions hold in $y$ when $x$ is
-fixed.
+the objective and inequality constraint functions are convex in $x$ and
+the equality constraint functions are affine in $x$. The same conditions
+hold in $y$ when $x$ is fixed.
 
 ## Disciplined biconvex programming
 
