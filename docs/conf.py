@@ -22,8 +22,8 @@ def _documentation_series(package_version: str) -> str:
 
 
 project = "DBCP"
-author = "Hao Zhu and Joschka Boedecker"
-copyright = "2026, Hao Zhu, Joschka Boedecker, and DBCP contributors"
+author = "Hao Zhu"
+copyright = "2026, Hao Zhu and DBCP contributors"
 package_version = __version__
 documentation_series = _documentation_series(package_version)
 version = documentation_series
