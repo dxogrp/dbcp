@@ -92,9 +92,10 @@ def _(mo):
 def _(BiconvexProblem, cp, k, m, n, xs):
     xbars = cp.Variable((k, n))
     zs = cp.Variable((m, k), nonneg=True)
-    obj = cp.sum(cp.multiply(zs, cp.vstack([cp.sum(cp.square(xs - c), axis=1) for c in xbars]).T))
+    d = cp.sum_squares(xs[:, None, :] - xbars[None, :, :], axis=2)
+    obj = cp.Minimize(cp.sum(cp.multiply(zs, d)))
     constr = [zs <= 1, cp.sum(zs, axis=1) == 1]
-    prob = BiconvexProblem(cp.Minimize(obj), [xbars], [zs], constr)
+    prob = BiconvexProblem(obj, [xbars], [zs], constr)
     prob.solve()
     return xbars, zs
 

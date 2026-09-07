@@ -49,10 +49,9 @@ def test_blin_logi_reg():
     U = cp.Variable((n, r))
     V = cp.Variable((k, r))
 
-    obj = 0
-    for _X, _y in zip(Xs, ys):
-        obj += cp.sum(cp.multiply(_y, cp.trace(U.T @ _X @ V)) - cp.logistic(cp.trace(U.T @ _X @ V)))
-    prob = BiconvexProblem(cp.Maximize(obj), [U], [V])
+    obj = cp.Maximize(sum(_y * cp.trace(U.T @ _X @ V) - cp.logistic(cp.trace(U.T @ _X @ V)) for _X, _y in zip(Xs, ys)))
+    prob = BiconvexProblem(obj, [U], [V])
+    assert prob.is_dbcp()
     prob.solve(cp.CLARABEL, lbd=10, abs_tol=1e-2)
 
     assert U.value is not None
@@ -72,9 +71,16 @@ def test_kmeans():
     zs = cp.Variable((m, k), nonneg=True)
 
     # Define the biconvex problem
-    obj = cp.sum(cp.multiply(zs, cp.vstack([cp.sum(cp.square(xs - c), axis=1) for c in xbars]).T))
+    d = cp.sum_squares(xs[:, None, :] - xbars[None, :, :], axis=2)
+    obj = cp.Minimize(cp.sum(cp.multiply(zs, d)))
     constr = [zs <= 1, cp.sum(zs, axis=1) == 1]
-    prob = BiconvexProblem(cp.Minimize(obj), [xbars], [zs], constr)
+    prob = BiconvexProblem(obj, [xbars], [zs], constr)
+
+    assert d.shape == (m, k)
+    assert obj.expr.shape == ()
+    assert prob.is_dbcp()
+
     prob.solve(canon_backend=cp.SCIPY_CANON_BACKEND, ignore_dpp=True)
 
     assert xbars.value is not None
+    assert zs.value is not None
