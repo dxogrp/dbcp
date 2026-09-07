@@ -53,7 +53,7 @@ def test_blin_logi_reg():
     for _X, _y in zip(Xs, ys):
         obj += cp.sum(cp.multiply(_y, cp.trace(U.T @ _X @ V)) - cp.logistic(cp.trace(U.T @ _X @ V)))
     prob = BiconvexProblem(cp.Maximize(obj), [[U], [V]])
-    prob.solve(cp.CLARABEL, lbd=10, gap_tolerance=1e-2)
+    prob.solve(cp.CLARABEL, lbd=10, abs_tol=1e-2)
 
     assert U.value is not None
     assert V.value is not None

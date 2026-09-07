@@ -100,7 +100,7 @@ def _(BiconvexProblem, Y, beta, cp, k, m, n, np):
         alpha.value = _a
         D.value = None
         X.value = None
-        prob.solve(cp.CLARABEL, gap_tolerance=1e-1)
+        prob.solve(cp.CLARABEL, abs_tol=1e-1)
         errs.append(cp.norm(D @ X - Y, "fro").value / cp.norm(Y, "fro").value)
         cards.append(cp.sum(cp.abs(X).value >= 1e-3).value)
     return cards, errs

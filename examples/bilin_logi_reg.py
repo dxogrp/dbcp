@@ -103,7 +103,7 @@ def _(BiconvexProblem, Xs, cp, k, n, r, ys):
     for _X, _y in zip(Xs, ys):
         obj += cp.sum(cp.multiply(_y, cp.trace(U.T @ _X @ V)) - cp.logistic(cp.trace(U.T @ _X @ V)))
     prob = BiconvexProblem(cp.Maximize(obj), [[U], [V]])
-    prob.solve(cp.CLARABEL, lbd=1, gap_tolerance=1e-2)
+    prob.solve(cp.CLARABEL, lbd=1, abs_tol=1e-2)
     return
 
 

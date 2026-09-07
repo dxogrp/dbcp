@@ -159,7 +159,7 @@ def _(BiconvexProblem, cp, k, m, mus, n, r, xs):
     for _c, _mu in zip(xbars_constr, mus):
         _constr.append(cp.norm2(_c - _mu) <= r)
     _prob = BiconvexProblem(cp.Minimize(_obj), [[xbars_constr], [zs_constr]], _constr)
-    _prob.solve(cp.CLARABEL, lbd=10, gap_tolerance=1e-1)
+    _prob.solve(cp.CLARABEL, lbd=10, abs_tol=1e-1)
     return (xbars_constr,)
 
 

@@ -189,7 +189,7 @@ def _(BiconvexRelaxProblem, K, cp, m, n, xs, ys):
     ]
 
     prob = BiconvexRelaxProblem(obj, ([zs], [thetas]), constr)
-    prob.solve(solver=cp.CLARABEL, nu=1e3, lbd=0.1, gap_tolerance=1e-3)
+    prob.solve(solver=cp.CLARABEL, nu=1e3, lbd=0.1, abs_tol=1e-3)
     return thetas, zs
 
 

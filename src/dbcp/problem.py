@@ -10,6 +10,26 @@ from dbcp.fix import fix_prob
 from dbcp.transform import relax_with_slack
 
 
+def _validate_tolerance(name: str, value: float) -> None:
+    """Validate a convergence tolerance."""
+    try:
+        is_valid = bool(np.isfinite(value)) and value >= 0
+    except (TypeError, ValueError):
+        is_valid = False
+    if not is_valid:
+        raise ValueError(f"{name} must be finite and nonnegative.")
+
+
+def _objective_gap_within_tolerance(
+    u: float,
+    v: float,
+    abs_tol: float,
+    rel_tol: float,
+) -> bool:
+    """Return whether two objective values meet the convergence criterion."""
+    return bool(np.abs(u - v) <= abs_tol + rel_tol * max(np.abs(u), np.abs(v)))
+
+
 class BiconvexProblem(cp.Problem):
     """A biconvex problem solved by proximal alternating convex search.
 
@@ -109,7 +129,14 @@ class BiconvexProblem(cp.Problem):
                     raise InitiationError("Cannot find a feasible point. Try different initial values.")
 
     def solve(
-        self, solver: str = cp.SCS, lbd: float = 0.1, max_iter: int = 100, gap_tolerance: float = 1e-6, *args, **kwargs
+        self,
+        solver: str = cp.SCS,
+        lbd: float = 0.1,
+        max_iter: int = 100,
+        abs_tol: float = 1e-6,
+        *args,
+        rel_tol: float = 1e-6,
+        **kwargs,
     ) -> float | None:
         """Solve the biconvex problem using alternate convex search.
 
@@ -121,10 +148,17 @@ class BiconvexProblem(cp.Problem):
             The regularization parameter of the proximal term.
         max_iter : int
             The maximum number of ACS iterations.
-        gap_tolerance : float
-            The tolerance for the gap between x- and y-problems.
+        abs_tol : float
+            The absolute tolerance for the gap between x- and y-problems.
+        rel_tol : float
+            The relative tolerance for the gap between x- and y-problems.
         *args, **kwargs : Additional arguments for the solver.
         """
+        if "gap_tolerance" in kwargs:
+            raise TypeError("'gap_tolerance' was removed; use 'abs_tol' and 'rel_tol'.")
+        _validate_tolerance("abs_tol", abs_tol)
+        _validate_tolerance("rel_tol", rel_tol)
+
         if not self.is_dbcp():
             raise DBCPError("Problem does not follow DBCP rules.")
 
@@ -186,7 +220,12 @@ class BiconvexProblem(cp.Problem):
                     raise SolveError(f"Solver {solver} failed. Try a different solver.")
                 gap = np.abs(xvalue - yvalue)
                 print(f"{i:<7} {xvalue:<20.9f} {yvalue:<20.9f} {gap:<10.4e}")
-                if gap < gap_tolerance:
+                if _objective_gap_within_tolerance(
+                    xvalue,
+                    yvalue,
+                    abs_tol,
+                    rel_tol,
+                ):
                     self._status = "converge"
                     break
                 else:
@@ -298,9 +337,10 @@ class BiconvexRelaxProblem(cp.Problem):
         lbd: float = 0.1,
         nu: float = 1,
         max_iter: int = 100,
-        gap_tolerance: float = 1e-6,
+        abs_tol: float = 1e-6,
         slack_tolerance: float = 1e-6,
         *args,
+        rel_tol: float = 1e-6,
         **kwargs,
     ) -> float | None:
         """Solve the biconvex problem using infeasible start alternate convex search.
@@ -315,13 +355,20 @@ class BiconvexRelaxProblem(cp.Problem):
             The penalty parameter for the total slackness.
         max_iter : int
             The maximum number of ACS iterations.
-        gap_tolerance : float
-            The tolerance for the gap between x- and y-problems.
+        abs_tol : float
+            The absolute tolerance for the gap between x- and y-problems.
         slack_tolerance : float
             The tolerance for the total slackness.
+        rel_tol : float
+            The relative tolerance for the gap between x- and y-problems.
         *args, **kwargs
             Additional arguments to pass to the solver.
         """
+        if "gap_tolerance" in kwargs:
+            raise TypeError("'gap_tolerance' was removed; use 'abs_tol' and 'rel_tol'.")
+        _validate_tolerance("abs_tol", abs_tol)
+        _validate_tolerance("rel_tol", rel_tol)
+
         if not self.is_dbcp():
             raise DBCPError("Problem does not follow DBCP rules.")
 
@@ -391,7 +438,12 @@ class BiconvexRelaxProblem(cp.Problem):
                 gap = np.abs(xvalue - yvalue)
                 total_slack = np.sum([np.sum(np.abs(s.value)) for s in self.slack_vars])
                 print(f"{i:<7} {xvalue:<20.9f} {yvalue:<20.9f} {gap:<20.4e} {total_slack:<20.4e} ")
-                if gap < gap_tolerance:
+                if _objective_gap_within_tolerance(
+                    xvalue,
+                    yvalue,
+                    abs_tol,
+                    rel_tol,
+                ):
                     if total_slack < slack_tolerance:
                         self._status = "converge"
                     else:

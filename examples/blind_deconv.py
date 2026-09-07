@@ -123,7 +123,7 @@ def _(BiconvexProblem, convolve, cp, d, m, n):
     )
     constr = [cp.norm(y, "inf") <= beta]
     prob = BiconvexProblem(obj, [[x], [y]], constr)
-    prob.solve(cp.CLARABEL, gap_tolerance=1e-5, max_iter=200)
+    prob.solve(cp.CLARABEL, abs_tol=1e-5, max_iter=200)
     return x, y
 
 
