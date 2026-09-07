@@ -1,6 +1,6 @@
 [project]
 name = "dbcp"
-version = "0.2.3"
+version = "1.0.0"
 description = "A CVXPY extension for disciplined biconvex programming."
 readme = "README.md"
 license = "Apache-2.0"
