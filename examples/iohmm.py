@@ -31,7 +31,7 @@ def _():
     figure_directory = _example_directory / "figures"
     figure_directory.mkdir(parents=True, exist_ok=True)
 
-    np.random.seed(10015)
+    np.random.seed(1)
     return BiconvexProblem, cp, figure_directory, mo, np, plt
 
 
@@ -189,7 +189,7 @@ def _(BiconvexProblem, K, cp, m, n, xs, ys):
     ]
 
     prob = BiconvexProblem(obj, [zs], [thetas], constr)
-    prob.solve(solver=cp.CLARABEL, mode="penalty", nu=1e3, lbd=0.1, abs_tol=1e-3)
+    prob.solve(solver=cp.CLARABEL, mode="penalty", nu=1e2, lbd=0.1, abs_tol=1e-3)
     return thetas, zs
 
 
