@@ -54,8 +54,7 @@ def _(mo):
 
     \[
         \begin{array}{ll}
-            \text{maximize} & \sum_{i = 1}^{m} y_i \mathop{\bf tr}(U^T X_i V)
-            - \log(1 + \exp(\mathop{\bf tr}(U^T X_i V)))
+            \text{maximize} & \sum_{i = 1}^{m} y_i \mathop{\bf tr}(U^T X_i V) - \log(1 + \exp(\mathop{\bf tr}(U^T X_i V)))
         \end{array}
     \]
 

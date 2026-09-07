@@ -77,10 +77,8 @@ def _(mo):
 
     \[
         \begin{array}{ll}
-            \text{minimize} & -\sum_{t = 1}^{m} {z(t)}^T {\left(y(t){x(t)}^T \theta_k
-            - \log(1 + \exp({x(t)}^T \theta_k))\right)}_{k = 1}^K\\
-            &\qquad + \alpha_\theta \sum_{k = 1}^{K} {\|\theta_k\|}^2_2
-            + \alpha_z \sum_{t = 1}^{m - 1} D_{\rm kl}(z(t), z(t + 1))\\
+            \text{minimize} & -\sum_{t = 1}^{m} {z(t)}^T {\left(y(t){x(t)}^T \theta_k - \log(1 + \exp({x(t)}^T \theta_k))\right)}_{k = 1}^K\\
+            &\qquad + \alpha_\theta \sum_{k = 1}^{K} {\|\theta_k\|}^2_2 + \alpha_z \sum_{t = 1}^{m - 1} D_{\rm kl}(z(t), z(t + 1))\\
             \text{subject to} & 0 \preceq z(t) \preceq \mathbf{1},\quad \mathbf{1}^T z(t) = 1,\quad t = 1, \ldots, m\\
             & \theta_k \in {\cal C}_k,\quad k = 1, \ldots, K,
         \end{array}
