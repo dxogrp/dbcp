@@ -110,17 +110,17 @@
 <section id="proximal-alternating-convex-search">
 <h2>Proximal alternating convex search<a class="headerlink" href="#proximal-alternating-convex-search" title="Link to this heading">¶</a></h2>
 <p>Let <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(y\)</span> denote the two variable blocks. Given the current point
-<span class="math notranslate nohighlight">\((x^k,y^k)\)</span>, DBCP alternates between convex subproblems of the schematic form</p>
+<span class="math notranslate nohighlight">\((x^{(k)},y^{(k)})\)</span>, DBCP alternates between convex subproblems of the schematic form</p>
 <div class="math notranslate nohighlight">
 \[
-x^{k+1}\in\mathop{\rm argmin}_x
-f_0(x,y^k)+\lambda\|x-x^k\|_F^2
+x^{(k+1)}\in\mathop{\rm argmin}_x
+f_0(x,y^{(k)})+\lambda\|x-x^{(k)}\|_F^2
 \]</div>
 <p>and</p>
 <div class="math notranslate nohighlight">
 \[
-y^{k+1}\in\mathop{\rm argmin}_y
-f_0(x^{k+1},y)+\lambda\|y-y^k\|_F^2,
+y^{(k+1)}\in\mathop{\rm argmin}_y
+f_0(x^{(k+1)},y)+\lambda\|y-y^{(k)}\|_F^2,
 \]</div>
 <p>with the analogous sign adjustment for a maximization objective. The
 regularization parameter is the <code class="docutils literal notranslate"><span class="pre">lbd</span></code> solve argument. The proximal terms make
@@ -142,8 +142,9 @@ DBCP stops when their absolute difference is below <code class="docutils literal
 <code class="docutils literal notranslate"><span class="pre">gap_tolerance=1e-6</span></code>. Additional positional and keyword arguments are passed
 to CVXPY’s <code class="docutils literal notranslate"><span class="pre">Problem.solve()</span></code> calls.</p>
 <p>For a relaxed problem, <code class="docutils literal notranslate"><span class="pre">nu=1</span></code> and <code class="docutils literal notranslate"><span class="pre">slack_tolerance=1e-6</span></code> by default.</p>
-<p>Alternating convex search is a local heuristic. A small objective gap is the
-package’s termination test, not a certificate of global optimality.</p>
+<p>Note that alternating convex search is a local heuristic.
+Its objective-gap stopping test, including a <code class="docutils literal notranslate"><span class="pre">converge</span></code>
+status, is <strong>not</strong> a certificate of global optimality.</p>
 </section>
 <section id="feasible-initialization">
 <h2>Feasible initialization<a class="headerlink" href="#feasible-initialization" title="Link to this heading">¶</a></h2>
@@ -159,11 +160,12 @@ and can improve repeatability.</p>
 </section>
 <section id="infeasible-start-relaxation">
 <h2>Infeasible-start relaxation<a class="headerlink" href="#infeasible-start-relaxation" title="Link to this heading">¶</a></h2>
-<p><a class="reference internal" href="api.html#dbcp.BiconvexRelaxProblem" title="dbcp.BiconvexRelaxProblem"><code class="xref py py-class docutils literal notranslate"><span class="pre">dbcp.BiconvexRelaxProblem</span></code></a> keeps constraint slacks in both alternating
-subproblems. For minimization it solves a penalized objective of the form</p>
+<p><a class="reference internal" href="api.html#dbcp.BiconvexRelaxProblem" title="dbcp.BiconvexRelaxProblem"><code class="xref py py-class docutils literal notranslate"><span class="pre">dbcp.BiconvexRelaxProblem</span></code></a> introduces nonnegative slacks <span class="math notranslate nohighlight">\(s\)</span> for
+inequality constraints and unrestricted slacks <span class="math notranslate nohighlight">\(t\)</span> for equality constraints.
+For minimization, it solves a penalized objective of the form</p>
 <div class="math notranslate nohighlight">
 \[
-f_0(x,y)+\nu\sum_i\|s_i\|_1,
+f_0(x,y)+\nu\left(\mathbf{1}^T s+\lVert t\rVert_1\right),
 \]</div>
 <p>while maximization subtracts the same penalty. Set <code class="docutils literal notranslate"><span class="pre">nu</span></code> in <code class="docutils literal notranslate"><span class="pre">solve()</span></code>; a larger
 value places more emphasis on satisfying the original constraints.</p>
@@ -200,7 +202,7 @@ keyword arguments.</p>
     <div class="clearer"></div>
   </div>
     <div class="footer">
-      &#169;2026, Hao Zhu, Joschka Boedecker, and DBCP contributors.
+      &#169;2026, Hao Zhu and DBCP contributors.
       
       |
       <a href="_sources/solving.md.txt"

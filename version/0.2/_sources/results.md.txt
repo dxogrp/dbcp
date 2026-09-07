@@ -22,8 +22,6 @@ objective at the final variables. It excludes both the proximal term and the
 slack penalty. The relaxed problem itself is available through `rlx_prob` for
 advanced inspection.
 
-Neither class returns an iteration history or a global-optimality certificate.
-
 ## Direct-problem statuses
 
 ```{list-table}
@@ -66,5 +64,5 @@ A relaxed status containing `infeasible` also emits a warning with the final
 constraint-violation total. Increasing `nu`, improving the initial values, or
 using another convex solver can produce a more feasible point.
 
-The statuses describe DBCP's stopping tests. Even `converge` does not imply a
-globally optimal solution to the original biconvex problem.
+See {doc}`solving` for the ACS algorithm and the interpretation of its
+objective-gap stopping test.

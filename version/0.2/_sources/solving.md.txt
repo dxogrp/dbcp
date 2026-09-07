@@ -3,18 +3,18 @@
 ## Proximal alternating convex search
 
 Let $x$ and $y$ denote the two variable blocks. Given the current point
-$(x^k,y^k)$, DBCP alternates between convex subproblems of the schematic form
+$(x^{(k)},y^{(k)})$, DBCP alternates between convex subproblems of the schematic form
 
 $$
-x^{k+1}\in\mathop{\rm argmin}_x
-f_0(x,y^k)+\lambda\|x-x^k\|_F^2
+x^{(k+1)}\in\mathop{\rm argmin}_x
+f_0(x,y^{(k)})+\lambda\|x-x^{(k)}\|_F^2
 $$
 
 and
 
 $$
-y^{k+1}\in\mathop{\rm argmin}_y
-f_0(x^{k+1},y)+\lambda\|y-y^k\|_F^2,
+y^{(k+1)}\in\mathop{\rm argmin}_y
+f_0(x^{(k+1)},y)+\lambda\|y-y^{(k)}\|_F^2,
 $$
 
 with the analogous sign adjustment for a maximization objective. The
@@ -42,8 +42,9 @@ to CVXPY's `Problem.solve()` calls.
 
 For a relaxed problem, `nu=1` and `slack_tolerance=1e-6` by default.
 
-Alternating convex search is a local heuristic. A small objective gap is the
-package's termination test, not a certificate of global optimality.
+Note that alternating convex search is a local heuristic.
+Its objective-gap stopping test, including a `converge`
+status, is **not** a certificate of global optimality.
 
 ## Feasible initialization
 
@@ -61,11 +62,12 @@ and can improve repeatability.
 
 ## Infeasible-start relaxation
 
-{class}`dbcp.BiconvexRelaxProblem` keeps constraint slacks in both alternating
-subproblems. For minimization it solves a penalized objective of the form
+{class}`dbcp.BiconvexRelaxProblem` introduces nonnegative slacks $s$ for
+inequality constraints and unrestricted slacks $t$ for equality constraints.
+For minimization, it solves a penalized objective of the form
 
 $$
-f_0(x,y)+\nu\sum_i\|s_i\|_1,
+f_0(x,y)+\nu\left(\mathbf{1}^T s+\lVert t\rVert_1\right),
 $$
 
 while maximization subtracts the same penalty. Set `nu` in `solve()`; a larger

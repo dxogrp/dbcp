@@ -57,11 +57,7 @@
 <li class="toctree-l1"><a class="reference internal" href="rules.html">DBCP rules and supported expressions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="solving.html">Solving</a></li>
 <li class="toctree-l1"><a class="reference internal" href="results.html">Results and statuses</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Examples</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#getting-started">Getting started</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#applications">Applications</a></li>
-</ul>
-</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="troubleshooting.html">Troubleshooting</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="release-notes.html">Release notes</a></li>
@@ -106,16 +102,9 @@
 <p>The gallery consists of standalone <a class="reference external" href="https://marimo.io/">Marimo</a> notebooks.
 Each link opens an executed, non-interactive HTML snapshot containing the
 notebook code and outputs.</p>
-<section id="getting-started">
-<h2>Getting started<a class="headerlink" href="#getting-started" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p><a class="extlink-example reference external" href="examples/nonneg_matrix_fact.html" rel="noopener" target="_blank">Nonnegative matrix factorization</a>
 introduces the two-block model and proximal alternating solve.</p></li>
-</ul>
-</section>
-<section id="applications">
-<h2>Applications<a class="headerlink" href="#applications" title="Link to this heading">¶</a></h2>
-<ul class="simple">
 <li><p><a class="extlink-example reference external" href="examples/bilin_logi_reg.html" rel="noopener" target="_blank">Bilinear logistic regression</a>
 fits a low-rank bilinear classifier with a maximization objective.</p></li>
 <li><p><a class="extlink-example reference external" href="examples/blind_deconv.html" rel="noopener" target="_blank">Blind deconvolution</a>
@@ -124,9 +113,9 @@ recovers a sparse signal and smooth kernel using <a class="reference internal" h
 explores the tradeoff between reconstruction error and code sparsity.</p></li>
 <li><p><a class="extlink-example reference external" href="examples/iohmm.html" rel="noopener" target="_blank">Input-output hidden Markov model</a>
 uses <a class="reference internal" href="api.html#dbcp.BiconvexRelaxProblem" title="dbcp.BiconvexRelaxProblem"><code class="xref py py-class docutils literal notranslate"><span class="pre">dbcp.BiconvexRelaxProblem</span></code></a> for a constrained latent-state fit.</p></li>
-<li><p><a class="extlink-example reference external" href="examples/kmeans.html" rel="noopener" target="_blank">$k$-means clustering</a>
+<li><p><a class="extlink-example reference external" href="examples/kmeans.html" rel="noopener" target="_blank">k-means clustering</a>
 models cluster centers and soft assignment weights as separate blocks.</p></li>
-<li><p><a class="extlink-example reference external" href="examples/kmeans_constr.html" rel="noopener" target="_blank">Constrained $k$-means clustering</a>
+<li><p><a class="extlink-example reference external" href="examples/kmeans_constr.html" rel="noopener" target="_blank">Constrained k-means clustering</a>
 compares unconstrained centers with centers restricted to prescribed balls.</p></li>
 </ul>
 <p>For live interaction, install and open the gallery from a repository checkout:</p>
@@ -134,7 +123,6 @@ compares unconstrained centers with centers restricted to prescribed balls.</p><
 make<span class="w"> </span>marimo
 </pre></div>
 </div>
-</section>
 </section>
 
 
@@ -145,7 +133,7 @@ make<span class="w"> </span>marimo
     <div class="clearer"></div>
   </div>
     <div class="footer">
-      &#169;2026, Hao Zhu, Joschka Boedecker, and DBCP contributors.
+      &#169;2026, Hao Zhu and DBCP contributors.
       
       |
       <a href="_sources/examples.md.txt"

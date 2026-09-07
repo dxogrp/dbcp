@@ -108,7 +108,8 @@
 \[\begin{split}
 \begin{array}{ll}
 \text{minimize} &amp; \|XY-A\|_F^2 \\
-\text{subject to} &amp; X\geq0,\quad Y\geq0 \quad \text{(elementwise)}.
+\text{subject to} &amp; X_{ij} \geq 0,\quad i=1,\ldots,m,\quad j=1,\ldots,k\\
+&amp; Y_{ij} \geq 0,\quad i=1,\ldots,k,\quad j=1,\ldots,n.
 \end{array}
 \end{split}\]</div>
 <p>The objective is convex in <span class="math notranslate nohighlight">\(X\)</span> for fixed <span class="math notranslate nohighlight">\(Y\)</span> and convex in <span class="math notranslate nohighlight">\(Y\)</span> for fixed
@@ -155,7 +156,7 @@ warm start is desired.</p>
     <div class="clearer"></div>
   </div>
     <div class="footer">
-      &#169;2026, Hao Zhu, Joschka Boedecker, and DBCP contributors.
+      &#169;2026, Hao Zhu and DBCP contributors.
       
       |
       <a href="_sources/quickstart.md.txt"

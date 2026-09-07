@@ -101,7 +101,7 @@
   <section class="tex2jax_ignore mathjax_ignore" id="dbcp-disciplined-biconvex-programming-in-python">
 <h1>DBCP: Disciplined Biconvex Programming in Python<a class="headerlink" href="#dbcp-disciplined-biconvex-programming-in-python" title="Link to this heading">¶</a></h1>
 <p>DBCP is a <a class="reference external" href="https://www.cvxpy.org/">CVXPY</a> extension for modeling and
-approximately solving biconvex optimization problems. A two-block biconvex
+approximately solving biconvex optimization problems. A biconvex
 problem has the form</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
@@ -111,7 +111,7 @@ problem has the form</p>
 &amp; h_i(x,y)=0, \quad i=1,\ldots,p,
 \end{array}
 \end{split}\]</div>
-<p>where <span class="math notranslate nohighlight">\(x\in X\)</span> and <span class="math notranslate nohighlight">\(y\in Y\)</span> are the two variable blocks. With <span class="math notranslate nohighlight">\(y\)</span> fixed,
+<p>where <span class="math notranslate nohighlight">\(x\in \mathcal{X}\)</span> and <span class="math notranslate nohighlight">\(y\in \mathcal{Y}\)</span> are the two variable blocks. With <span class="math notranslate nohighlight">\(y\)</span> fixed,
 the objective and inequality constraint functions are convex in <span class="math notranslate nohighlight">\(x\)</span> and
 the equality constraint functions are affine in <span class="math notranslate nohighlight">\(x\)</span>. The same conditions
 hold in <span class="math notranslate nohighlight">\(y\)</span> when <span class="math notranslate nohighlight">\(x\)</span> is fixed.</p>
@@ -119,11 +119,10 @@ hold in <span class="math notranslate nohighlight">\(y\)</span> when <span class
 <h2>Disciplined biconvex programming<a class="headerlink" href="#disciplined-biconvex-programming" title="Link to this heading">¶</a></h2>
 <p>DBCP extends CVXPY’s disciplined convex programming rules with structured
 products between expressions from the two variable blocks. A model is accepted
-when fixing either supplied block produces a DCP-compliant CVXPY problem.</p>
+when fixing either supplied block produces a <a class="reference external" href="https://www.cvxpy.org/tutorial/dcp/index.html">DCP</a>-compliant CVXPY problem.</p>
 <p>DBCP solves accepted models using proximal alternating convex search. Each
-iteration solves one convex subproblem with the other block fixed. This is a
-local heuristic for a generally difficult nonconvex problem: convergence does
-not certify a global optimum.</p>
+iteration solves one convex subproblem with the other block fixed. See
+<a class="reference internal" href="solving.html"><span class="doc">Solving</span></a> for the algorithm and the interpretation of its stopping test.</p>
 <p>Use <a class="reference internal" href="api.html#dbcp.BiconvexProblem" title="dbcp.BiconvexProblem"><code class="xref py py-class docutils literal notranslate"><span class="pre">dbcp.BiconvexProblem</span></code></a> when the original constraints should be
 satisfied throughout the alternating solve. Use
 <a class="reference internal" href="api.html#dbcp.BiconvexRelaxProblem" title="dbcp.BiconvexRelaxProblem"><code class="xref py py-class docutils literal notranslate"><span class="pre">dbcp.BiconvexRelaxProblem</span></code></a> to introduce and penalize constraint slacks,
@@ -142,7 +141,7 @@ feasible for the original model.</p>
     <div class="clearer"></div>
   </div>
     <div class="footer">
-      &#169;2026, Hao Zhu, Joschka Boedecker, and DBCP contributors.
+      &#169;2026, Hao Zhu and DBCP contributors.
       
       |
       <a href="_sources/index.md.txt"

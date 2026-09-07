@@ -111,7 +111,7 @@ subproblem. Its additional modeling pattern is multiplication between
 expressions that depend on different variable blocks.</p>
 <section id="product-compositions">
 <h2>Product compositions<a class="headerlink" href="#product-compositions" title="Link to this heading">¶</a></h2>
-<p>The DBCP syntax described by the accompanying paper permits the following
+<p>The DBCP syntax described by the <a class="reference external" href="https://haozhu10015.github.io/papers/dbcp.html">accompanying paper</a> permits the following
 curvature and sign combinations across a product:</p>
 <table class="docutils align-default">
 <colgroup>
@@ -150,20 +150,24 @@ curvature and sign combinations across a product:</p>
 </table>
 <p>The factors may be exchanged. Their signs and curvatures must be known to
 CVXPY; numerical values alone do not establish a symbolic sign.</p>
-<p>The formal DBCP syntax also requires an acyclic variable-interaction graph,
-where an edge joins variables that occur on opposite sides of one of these
-products. In the current package, the user supplies the two-block partition
-directly and <a class="reference internal" href="api.html#dbcp.BiconvexProblem.is_dbcp" title="dbcp.BiconvexProblem.is_dbcp"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dbcp.BiconvexProblem.is_dbcp()</span></code></a> operationally checks only
-that both resulting fixed problems are DCP. It does not independently audit
-the interaction graph.</p>
+<p>The formal DBCP product rule requires one consistent assignment of the
+relevant variables to two blocks across the objective and all constraints. In
+every product whose two factors both contain variables, one factor may contain
+variables only from one block and the other only from the other block. This
+prevents expressions like <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">*</span> <span class="pre">y</span></code>, <code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">*</span> <span class="pre">z</span></code>, and <code class="docutils literal notranslate"><span class="pre">z</span> <span class="pre">*</span> <span class="pre">x</span></code> appearing sumultaneously
+in the same problem.</p>
+<p>In the package, the user supplies the two disjoint variable groups fixed on
+alternating ACS steps. Variables may be omitted from both groups and remain
+active in both subproblems, provided both subproblems are DCP.
+<a class="reference internal" href="api.html#dbcp.BiconvexProblem.is_dbcp" title="dbcp.BiconvexProblem.is_dbcp"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dbcp.BiconvexProblem.is_dbcp()</span></code></a> checks that operational condition; it does
+not separately traverse products to verify the formal assignment rule.</p>
 </section>
 <section id="cvxpy-atoms-and-constraints">
 <h2>CVXPY atoms and constraints<a class="headerlink" href="#cvxpy-atoms-and-constraints" title="Link to this heading">¶</a></h2>
-<p>There is no separate allowlist of scalar CVXPY atoms. An expression is usable
-when copying it with either variable block replaced by parameters succeeds and
-both resulting problems satisfy DCP. DPP is not required, although a
-non-DPP parameterization can make CVXPY canonicalize a subproblem again on
-each solve.</p>
+<p>An CVXPY expression is usable when copying it with either variable block
+replaced by parameters succeeds and both resulting problems satisfy DCP.
+DPP is not required, although a non-DPP parameterization can make CVXPY
+canonicalize a subproblem again on each solve.</p>
 <p>The supported constraint families are:</p>
 <ul class="simple">
 <li><p>equality and zero constraints;</p></li>
@@ -198,7 +202,7 @@ one-dimensional; otherwise the helper raises <code class="docutils literal notra
     <div class="clearer"></div>
   </div>
     <div class="footer">
-      &#169;2026, Hao Zhu, Joschka Boedecker, and DBCP contributors.
+      &#169;2026, Hao Zhu and DBCP contributors.
       
       |
       <a href="_sources/rules.md.txt"

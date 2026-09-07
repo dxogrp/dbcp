@@ -6,7 +6,7 @@ expressions that depend on different variable blocks.
 
 ## Product compositions
 
-The DBCP syntax described by the accompanying paper permits the following
+The DBCP syntax described by the [accompanying paper](https://haozhu10015.github.io/papers/dbcp.html) permits the following
 curvature and sign combinations across a product:
 
 ```{list-table}
@@ -36,20 +36,25 @@ curvature and sign combinations across a product:
 The factors may be exchanged. Their signs and curvatures must be known to
 CVXPY; numerical values alone do not establish a symbolic sign.
 
-The formal DBCP syntax also requires an acyclic variable-interaction graph,
-where an edge joins variables that occur on opposite sides of one of these
-products. In the current package, the user supplies the two-block partition
-directly and {meth}`dbcp.BiconvexProblem.is_dbcp` operationally checks only
-that both resulting fixed problems are DCP. It does not independently audit
-the interaction graph.
+The formal DBCP product rule requires one consistent assignment of the
+relevant variables to two blocks across the objective and all constraints. In
+every product whose two factors both contain variables, one factor may contain
+variables only from one block and the other only from the other block. This
+prevents expressions like `x * y`, `y * z`, and `z * x` appearing sumultaneously
+in the same problem.
+
+In the package, the user supplies the two disjoint variable groups fixed on
+alternating ACS steps. Variables may be omitted from both groups and remain
+active in both subproblems, provided both subproblems are DCP.
+{meth}`dbcp.BiconvexProblem.is_dbcp` checks that operational condition; it does
+not separately traverse products to verify the formal assignment rule.
 
 ## CVXPY atoms and constraints
 
-There is no separate allowlist of scalar CVXPY atoms. An expression is usable
-when copying it with either variable block replaced by parameters succeeds and
-both resulting problems satisfy DCP. DPP is not required, although a
-non-DPP parameterization can make CVXPY canonicalize a subproblem again on
-each solve.
+An CVXPY expression is usable when copying it with either variable block
+replaced by parameters succeeds and both resulting problems satisfy DCP.
+DPP is not required, although a non-DPP parameterization can make CVXPY
+canonicalize a subproblem again on each solve.
 
 The supported constraint families are:
 

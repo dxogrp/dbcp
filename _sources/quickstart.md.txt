@@ -7,7 +7,8 @@ $Y\in\mathbf{R}^{k\times n}$:
 $$
 \begin{array}{ll}
 \text{minimize} & \|XY-A\|_F^2 \\
-\text{subject to} & X\geq0,\quad Y\geq0 \quad \text{(elementwise)}.
+\text{subject to} & X_{ij} \geq 0,\quad i=1,\ldots,m,\quad j=1,\ldots,k\\
+& Y_{ij} \geq 0,\quad i=1,\ldots,k,\quad j=1,\ldots,n.
 \end{array}
 $$
 

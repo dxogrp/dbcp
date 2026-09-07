@@ -40,8 +40,7 @@ rules. In particular:
 - every equality must be affine in either fixed problem.
 
 Call {meth}`dbcp.BiconvexProblem.is_dbcp` after construction to check the two
-generated subproblems. It returns a Boolean; it does not provide a separate
-validation report.
+generated subproblems.
 
 DBCP's constraint transformation currently supports CVXPY equality,
 inequality, zero, nonpositive, nonnegative, positive-semidefinite, and

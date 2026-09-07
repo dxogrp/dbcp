@@ -122,7 +122,6 @@ evaluated after the final y-subproblem; it excludes the proximal term.</p>
 objective at the final variables. It excludes both the proximal term and the
 slack penalty. The relaxed problem itself is available through <code class="docutils literal notranslate"><span class="pre">rlx_prob</span></code> for
 advanced inspection.</p>
-<p>Neither class returns an iteration history or a global-optimality certificate.</p>
 </section>
 <section id="direct-problem-statuses">
 <h2>Direct-problem statuses<a class="headerlink" href="#direct-problem-statuses" title="Link to this heading">¶</a></h2>
@@ -182,8 +181,8 @@ met its tolerance, and total slack remains above its tolerance.</p></td>
 <p>A relaxed status containing <code class="docutils literal notranslate"><span class="pre">infeasible</span></code> also emits a warning with the final
 constraint-violation total. Increasing <code class="docutils literal notranslate"><span class="pre">nu</span></code>, improving the initial values, or
 using another convex solver can produce a more feasible point.</p>
-<p>The statuses describe DBCP’s stopping tests. Even <code class="docutils literal notranslate"><span class="pre">converge</span></code> does not imply a
-globally optimal solution to the original biconvex problem.</p>
+<p>See <a class="reference internal" href="solving.html"><span class="doc">Solving</span></a> for the ACS algorithm and the interpretation of its
+objective-gap stopping test.</p>
 </section>
 </section>
 
@@ -195,7 +194,7 @@ globally optimal solution to the original biconvex problem.</p>
     <div class="clearer"></div>
   </div>
     <div class="footer">
-      &#169;2026, Hao Zhu, Joschka Boedecker, and DBCP contributors.
+      &#169;2026, Hao Zhu and DBCP contributors.
       
       |
       <a href="_sources/results.md.txt"

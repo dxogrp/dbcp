@@ -1,7 +1,7 @@
 # DBCP: Disciplined Biconvex Programming in Python
 
 DBCP is a [CVXPY](https://www.cvxpy.org/) extension for modeling and
-approximately solving biconvex optimization problems. A two-block biconvex
+approximately solving biconvex optimization problems. A biconvex
 problem has the form
 
 $$
@@ -12,7 +12,7 @@ $$
 \end{array}
 $$
 
-where $x\in X$ and $y\in Y$ are the two variable blocks. With $y$ fixed,
+where $x\in \mathcal{X}$ and $y\in \mathcal{Y}$ are the two variable blocks. With $y$ fixed,
 the objective and inequality constraint functions are convex in $x$ and
 the equality constraint functions are affine in $x$. The same conditions
 hold in $y$ when $x$ is fixed.
@@ -21,12 +21,11 @@ hold in $y$ when $x$ is fixed.
 
 DBCP extends CVXPY's disciplined convex programming rules with structured
 products between expressions from the two variable blocks. A model is accepted
-when fixing either supplied block produces a DCP-compliant CVXPY problem.
+when fixing either supplied block produces a [DCP](https://www.cvxpy.org/tutorial/dcp/index.html)-compliant CVXPY problem.
 
 DBCP solves accepted models using proximal alternating convex search. Each
-iteration solves one convex subproblem with the other block fixed. This is a
-local heuristic for a generally difficult nonconvex problem: convergence does
-not certify a global optimum.
+iteration solves one convex subproblem with the other block fixed. See
+{doc}`solving` for the algorithm and the interpretation of its stopping test.
 
 Use {class}`dbcp.BiconvexProblem` when the original constraints should be
 satisfied throughout the alternating solve. Use
