@@ -52,8 +52,8 @@ def _(mo):
     \[
         \hat{z}(t) \sim \left\{
             \begin{array}{ll}
-                {\rm Cat}(p_{\rm init}) & t = 0\\
-                {\rm Cat}(p_{\hat{z}(t - 1)}) & t > 0,
+                {\rm Cat}(p_{\rm init}) & t = 1\\
+                {\rm Cat}(p_{\hat{z}(t - 1)}) & t > 1,
             \end{array}\right.
     \]
 

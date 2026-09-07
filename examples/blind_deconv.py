@@ -76,7 +76,7 @@ def _(mo):
     The convolution $x \otimes y$ of the vectors $x$ and $y$ is given by
 
     \[
-        {(x \otimes y)}_k = \sum_{i + j = k} x_i y_j,\quad k = 1, \ldots, m + n - 1.
+        {(x \otimes y)}_k = \sum_{i + j = k + 1} x_i y_j,\quad k = 1, \ldots, m + n - 1.
     \]
     """)
     return
