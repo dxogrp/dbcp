@@ -5,8 +5,10 @@
 Inspect `problem.x_prob` and `problem.y_prob` separately with CVXPY's
 `is_dcp()` diagnostics. One of the problems still contains a non-DCP
 composition after the opposite variable block has been replaced by
-parameters. Check that every optimization variable is in exactly one supplied
-block and that CVXPY knows any required signs.
+parameters. Check that the two supplied groups are disjoint and that every
+variable omitted from both can remain active in both subproblems. The groups
+need not be exhaustive. Also check that CVXPY knows any signs required by the
+composition rules.
 
 The constructor itself can raise `TypeError` for a specialized constraint
 class that DBCP does not know how to copy. See {doc}`rules` for the supported
@@ -31,8 +33,10 @@ to strengthen the proximal regularization.
 
 `converge_inaccurate` means the objective-gap stopping test was not met within
 `max_iter`. Inspect the variable values and objective, then consider another
-starting point, a larger iteration budget, or a different `lbd`. Calling
-`solve()` again continues from the current variable values.
+starting point, a larger iteration budget, or a different `lbd`. If the
+objective is near zero, adjust `abs_tol`; if its magnitude is large,
+adjust `rel_tol`. Calling `solve()` again continues from the current
+variable values.
 
 ## A relaxed solution remains infeasible
 

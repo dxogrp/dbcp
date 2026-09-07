@@ -24,21 +24,32 @@ each half-step prefer points near the preceding iterate.
 After each pair of solves, DBCP evaluates the two fixed-subproblem objectives
 without their proximal terms. For a direct problem, these are the original
 objective; for a relaxed problem, they also contain the weighted slack penalty.
-DBCP stops when their absolute difference is below `gap_tolerance`, or after
-`max_iter` iterations.
+Let these objective values be $u$ and $v$. DBCP stops when
+
+$$
+|u-v| \leq \epsilon_{\mathrm{abs}}
+  + \epsilon_{\mathrm{rel}}\max\{|u|,|v|\},
+$$
+
+or after `max_iter` iterations. The solve arguments `abs_tol` and
+`rel_tol` specify $\epsilon_{\mathrm{abs}}$ and
+$\epsilon_{\mathrm{rel}}$, respectively.
 
 ```python
 value = problem.solve(
     solver=cp.CLARABEL,
     lbd=0.5,
     max_iter=200,
-    gap_tolerance=1e-7,
+    abs_tol=1e-7,
+    rel_tol=1e-6,
 )
 ```
 
 The default solver is `cp.SCS`, `lbd=0.1`, `max_iter=100`, and
-`gap_tolerance=1e-6`. Additional positional and keyword arguments are passed
-to CVXPY's `Problem.solve()` calls.
+`abs_tol=rel_tol=1e-6`. `abs_tol` may be passed
+positionally, whereas `rel_tol` is keyword-only. Setting the latter
+to zero gives an absolute-only stopping criterion. Additional positional and
+keyword arguments are passed to CVXPY's `Problem.solve()` calls.
 
 For a relaxed problem, `nu=1` and `slack_tolerance=1e-6` by default.
 
@@ -78,7 +89,7 @@ value = problem.solve(
     solver=cp.CLARABEL,
     nu=1e3,
     lbd=0.1,
-    gap_tolerance=1e-5,
+    abs_tol=1e-5,
     slack_tolerance=1e-7,
 )
 ```

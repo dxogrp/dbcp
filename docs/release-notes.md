@@ -1,35 +1,22 @@
 # Release notes
 
-## 0.2.3
+## 1.0
 
-- Standardized the project environment, build tooling, and continuous
-  integration around uv and Ruff.
-- Updated and strictly checked the Marimo example gallery, including a shared
-  publication-oriented Matplotlib style.
-- Added the versioned Sphinx user guide, API reference, and executed example
-  gallery.
+### 1.0.0
 
-## 0.2.2
+- Replaced the public `gap_tolerance` solve argument with `abs_tol` and the
+  keyword-only `rel_tol`. Both default to $10^{-6}$, and DBCP stops when
 
-- Added support for CVXPY 1.9.
+  $$
+  |u-v| \leq \epsilon_{\mathrm{abs}}
+    + \epsilon_{\mathrm{rel}}\max\{|u|,|v|\}.
+  $$
 
-## 0.2.1
+  The legacy `gap_tolerance` keyword is rejected with guidance to use the new
+  arguments. Setting `rel_tol=0` yields an absolute-only stopping criterion.
 
-- Updated the development lockfile's CVXPY resolution to 1.8.1.
+## 0.2
 
-## 0.2.0
-
-- Added {func}`dbcp.convolve` for biconvex convolution of one-dimensional
-  CVXPY expressions.
-
-## 0.1.1
-
-- Added the project citation.
-
-## 0.1.0
-
-- First minor release of DBCP.
-
-## 0.0.1
-
-- First tagged package release.
+The prototype series provided {class}`dbcp.BiconvexProblem` for direct
+alternating solves, {class}`dbcp.BiconvexRelaxProblem` for slack-relaxed
+solves, and {func}`dbcp.convolve` for biconvex convolution expressions.

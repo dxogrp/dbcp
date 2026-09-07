@@ -17,14 +17,32 @@ problem = dbcp.BiconvexProblem(
 )
 ```
 
-The first group contains variables optimized in the x-subproblem; the second
-contains variables optimized in the y-subproblem. Every optimization variable
-should belong to exactly one group. DBCP replaces the inactive group's
-variables with generated CVXPY parameters when it constructs each fixed
-subproblem.
+The first group contains variables optimized only in the x-subproblem; the
+second contains variables optimized only in the y-subproblem. The two groups
+must be disjoint, but they need not contain every optimization variable. DBCP
+replaces the inactive group's variables with generated CVXPY parameters when
+it constructs each fixed subproblem. A variable omitted from both groups
+remains active in both subproblems, which is valid when both subproblems remain
+DCP.
 
-The grouping is part of the model. DBCP does not search for a partition or
-verify that the supplied lists are disjoint and exhaustive.
+For example, `Z` can remain outside both groups in the following model:
+
+```python
+X = cp.Variable((m, k))
+Y = cp.Variable((k, n))
+Z = cp.Variable((m, n))
+
+problem = dbcp.BiconvexProblem(
+    cp.Minimize(cp.norm(X @ Y + Z - A, "fro")),
+    [[X], [Y]],
+    [cp.norm(Z, "fro") <= 1],
+)
+```
+
+Fixing either `X` or `Y` makes the product affine in the other factor, while
+`Z` remains an ordinary variable in both convex subproblems. The grouping is
+part of the model: DBCP neither searches for the groups nor verifies that they
+are disjoint, so disjointness is the caller's responsibility.
 
 (structural-requirements)=
 ## Structural requirements
@@ -36,8 +54,8 @@ rules. In particular:
 - fixing the second block must leave a convex minimization objective or a
   concave maximization objective in the first block;
 - fixing the first block must give the corresponding curvature in the second;
-- every inequality must be DCP in either fixed problem; and
-- every equality must be affine in either fixed problem.
+- every inequality must be DCP in both fixed problems; and
+- every equality must be affine in both fixed problems.
 
 Call {meth}`dbcp.BiconvexProblem.is_dbcp` after construction to check the two
 generated subproblems.

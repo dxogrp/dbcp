@@ -23,5 +23,9 @@ For live interaction, install and open the gallery from a repository checkout:
 
 ```shell
 make sync-examples
+make check-examples
 make marimo
 ```
+
+The `check-examples` target runs Marimo's strict static checks over every
+notebook; `marimo` opens the editable gallery in a browser.

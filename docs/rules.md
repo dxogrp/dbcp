@@ -6,8 +6,10 @@ expressions that depend on different variable blocks.
 
 ## Product compositions
 
-The DBCP syntax described by the [accompanying paper](https://haozhu10015.github.io/papers/dbcp.html) permits the following
-curvature and sign combinations across a product:
+Products with a constant or parameter factor follow the ordinary DCP rules.
+When both factors contain variables, the DBCP syntax described by the
+[accompanying paper](https://haozhu10015.github.io/papers/dbcp.html) permits
+the following curvature and sign combinations:
 
 ```{list-table}
 :header-rows: 1
@@ -40,8 +42,13 @@ The formal DBCP product rule requires one consistent assignment of the
 relevant variables to two blocks across the objective and all constraints. In
 every product whose two factors both contain variables, one factor may contain
 variables only from one block and the other only from the other block. This
-prevents expressions like `x * y`, `y * z`, and `z * x` appearing sumultaneously
-in the same problem.
+prevents expressions like `x * y`, `y * z`, and `z * x` from appearing
+simultaneously in the same problem: the first two products require `x` and `z`
+to share a block, while the last requires them to be in different blocks.
+
+The rule does not prohibit every cycle. Compatible even cycles are allowed;
+for example, the products `x * y`, `y * z`, `z * w`, and `w * x` admit the
+two-block assignment `{x, z}` and `{y, w}`.
 
 In the package, the user supplies the two disjoint variable groups fixed on
 alternating ACS steps. Variables may be omitted from both groups and remain
@@ -51,7 +58,7 @@ not separately traverse products to verify the formal assignment rule.
 
 ## CVXPY atoms and constraints
 
-An CVXPY expression is usable when copying it with either variable block
+A CVXPY expression is usable when copying it with either variable block
 replaced by parameters succeeds and both resulting problems satisfy DCP.
 DPP is not required, although a non-DPP parameterization can make CVXPY
 canonicalize a subproblem again on each solve.

@@ -45,7 +45,6 @@ The two inner lists define the variable partition. During the x-subproblem,
 DBCP optimizes `X` while holding `Y` fixed; during the y-subproblem it does the
 reverse. The original CVXPY variables receive the final numerical values.
 
-Because alternating convex search is a local method and unset variables are
-initialized randomly, different starting points can produce different
-factorizations. Assign `X.value` and `Y.value` before `solve()` when a specific
-warm start is desired.
+Because unset variables are initialized randomly, different starting points
+can produce different factorizations. Assign `X.value` and `Y.value` before
+`solve()` when a specific warm start is desired.

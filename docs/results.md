@@ -31,11 +31,11 @@ advanced inspection.
 * - Status
   - Meaning
 * - `converge`
-  - The absolute gap between the final x- and y-subproblem objective values is
-    below `gap_tolerance`.
+  - The gap between the final x- and y-subproblem objective values satisfies
+    the combined `abs_tol` and `rel_tol` stopping test.
 * - `converge_inaccurate`
-  - The solve reached `max_iter` before that objective gap fell below the
-    tolerance.
+  - The solve reached `max_iter` before that objective gap satisfied the
+    combined stopping test.
 ```
 
 ## Relaxed-problem statuses
@@ -47,17 +47,19 @@ advanced inspection.
 * - Status
   - Meaning
 * - `converge`
-  - The slack-penalized subproblem objective gap is within tolerance and total
-    slack is below `slack_tolerance`.
+  - The slack-penalized subproblem objective gap satisfies the combined
+    absolute-and-relative stopping test and total slack is below
+    `slack_tolerance`.
 * - `converge_infeasible`
-  - The slack-penalized subproblem objective gap is within tolerance, but the
-    final total slack is not.
+  - The slack-penalized subproblem objective gap satisfies the combined
+    stopping test, but the final total slack is not below `slack_tolerance`.
 * - `converge_inaccurate`
   - The iteration limit was reached before the slack-penalized objective gap
-    met its tolerance, but total slack is below its tolerance.
+    met its combined tolerance, but total slack is below `slack_tolerance`.
 * - `converge_inaccurate_infeasible`
   - The iteration limit was reached before the slack-penalized objective gap
-    met its tolerance, and total slack remains above its tolerance.
+    met its combined tolerance, and total slack remains at or above
+    `slack_tolerance`.
 ```
 
 A relaxed status containing `infeasible` also emits a warning with the final
