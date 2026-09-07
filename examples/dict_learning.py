@@ -92,7 +92,7 @@ def _(BiconvexProblem, Y, beta, cp, k, m, n, np):
     X = cp.Variable((k, n))
     alpha = cp.Parameter(nonneg=True)
     obj = cp.Minimize(cp.sum_squares(D @ X - Y) + alpha * cp.norm1(X))
-    prob = BiconvexProblem(obj, [[D], [X]], [cp.norm(D, "fro") <= beta])
+    prob = BiconvexProblem(obj, [D], [X], [cp.norm(D, "fro") <= beta])
 
     errs = []
     cards = []

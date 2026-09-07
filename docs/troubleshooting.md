@@ -19,8 +19,8 @@ families.
 A direct solve can raise `dbcp.error.InitiationError` when its alternating
 slack-minimization phase cannot find a point satisfying the original
 constraints. Assign feasible or nearly feasible values to the model variables,
-try another random seed, or use {class}`dbcp.BiconvexRelaxProblem` when a
-penalized infeasible start is appropriate.
+try another random seed, or call `solve(mode="penalty")` when a penalized
+infeasible start is appropriate.
 
 ## A convex subproblem fails
 
@@ -38,10 +38,10 @@ objective is near zero, adjust `abs_tol`; if its magnitude is large,
 adjust `rel_tol`. Calling `solve()` again continues from the current
 variable values.
 
-## A relaxed solution remains infeasible
+## A penalty-mode solution remains infeasible
 
-Statuses containing `infeasible` mean the total absolute slack is at least
-`slack_tolerance`. Increase `nu` to penalize slack more heavily, initialize
+Statuses containing `infeasible` mean the total absolute slack is greater than
+`slack_tol`. Increase `nu` to penalize slack more heavily, initialize
 closer to the original feasible set, or reconsider whether the constraints are
 jointly feasible.
 

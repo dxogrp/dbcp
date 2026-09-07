@@ -13,7 +13,7 @@ notebook code and outputs.
 - {example}`Sparse dictionary learning <dict_learning>`
   explores the tradeoff between reconstruction error and code sparsity.
 - {example}`Input-output hidden Markov model <iohmm>`
-  uses {class}`dbcp.BiconvexRelaxProblem` for a constrained latent-state fit.
+  uses penalty mode for a constrained latent-state fit.
 - {example}`k-means clustering <kmeans>`
   models cluster centers and soft assignment weights as separate blocks.
 - {example}`Constrained k-means clustering <kmeans_constr>`

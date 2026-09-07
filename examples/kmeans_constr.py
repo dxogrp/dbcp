@@ -137,7 +137,7 @@ def _(BiconvexProblem, cp, k, m, n, xs):
     zs = cp.Variable((m, k), nonneg=True)
     _obj = cp.sum(cp.multiply(zs, cp.vstack([cp.sum(cp.square(xs - c), axis=1) for c in xbars]).T))
     _constr = [zs <= 1, cp.sum(zs, axis=1) == 1]
-    _prob = BiconvexProblem(cp.Minimize(_obj), [[xbars], [zs]], _constr)
+    _prob = BiconvexProblem(cp.Minimize(_obj), [xbars], [zs], _constr)
     _prob.solve(cp.CLARABEL, lbd=2)
     return (xbars,)
 
@@ -158,7 +158,7 @@ def _(BiconvexProblem, cp, k, m, mus, n, r, xs):
     _constr = [zs_constr <= 1, cp.sum(zs_constr, axis=1) == 1]
     for _c, _mu in zip(xbars_constr, mus):
         _constr.append(cp.norm2(_c - _mu) <= r)
-    _prob = BiconvexProblem(cp.Minimize(_obj), [[xbars_constr], [zs_constr]], _constr)
+    _prob = BiconvexProblem(cp.Minimize(_obj), [xbars_constr], [zs_constr], _constr)
     _prob.solve(cp.CLARABEL, lbd=10, abs_tol=1e-1)
     return (xbars_constr,)
 

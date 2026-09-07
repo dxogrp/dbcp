@@ -17,7 +17,7 @@ def test_nmf():
 
     # Define the biconvex problem
     obj = cp.Minimize(cp.sum_squares(X @ Y - A))
-    prob = BiconvexProblem(obj, [[X], [Y]])
+    prob = BiconvexProblem(obj, [X], [Y])
     prob.solve()
 
     # Check that the solution is non-negative
@@ -52,7 +52,7 @@ def test_blin_logi_reg():
     obj = 0
     for _X, _y in zip(Xs, ys):
         obj += cp.sum(cp.multiply(_y, cp.trace(U.T @ _X @ V)) - cp.logistic(cp.trace(U.T @ _X @ V)))
-    prob = BiconvexProblem(cp.Maximize(obj), [[U], [V]])
+    prob = BiconvexProblem(cp.Maximize(obj), [U], [V])
     prob.solve(cp.CLARABEL, lbd=10, abs_tol=1e-2)
 
     assert U.value is not None
@@ -74,7 +74,7 @@ def test_kmeans():
     # Define the biconvex problem
     obj = cp.sum(cp.multiply(zs, cp.vstack([cp.sum(cp.square(xs - c), axis=1) for c in xbars]).T))
     constr = [zs <= 1, cp.sum(zs, axis=1) == 1]
-    prob = BiconvexProblem(cp.Minimize(obj), [[xbars], [zs]], constr)
+    prob = BiconvexProblem(cp.Minimize(obj), [xbars], [zs], constr)
     prob.solve(canon_backend=cp.SCIPY_CANON_BACKEND, ignore_dpp=True)
 
     assert xbars.value is not None

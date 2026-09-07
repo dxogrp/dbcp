@@ -18,7 +18,7 @@ def test_psd():
     # Define the biconvex problem
     obj = cp.Minimize(cp.sum_squares(X @ Y - A))
     constr = [X >> 0]
-    prob = dbcp.BiconvexProblem(obj, [[Y], [X]], constr)
+    prob = dbcp.BiconvexProblem(obj, [Y], [X], constr)
 
     X.value = np.random.randn(m, k)
     assert not constr[0].value()

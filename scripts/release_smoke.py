@@ -36,7 +36,7 @@ def _smoke_biconvex_problem() -> None:
     y = cp.Variable(name="y")
     x.value = 1.0
     y.value = 1.0
-    problem = dbcp.BiconvexProblem(cp.Minimize(cp.square(x * y - 1.0)), ([x], [y]))
+    problem = dbcp.BiconvexProblem(cp.Minimize(cp.square(x * y - 1.0)), [x], [y])
     result = problem.solve(
         solver=cp.SCS,
         max_iter=10,
@@ -48,36 +48,53 @@ def _smoke_biconvex_problem() -> None:
         raise RuntimeError(f"Biconvex release smoke solve failed: status={problem.status!r}, values={values}.")
 
 
-def _smoke_biconvex_relax_problem() -> None:
-    x = cp.Variable(name="relaxed_x")
-    y = cp.Variable(name="relaxed_y")
+def _smoke_biconvex_penalty_mode() -> None:
+    slack_tol = 1e-5
+    x = cp.Variable(name="penalty_x")
+    y = cp.Variable(name="penalty_y")
     x.value = 1.0
     y.value = 1.0
-    problem = dbcp.BiconvexRelaxProblem(
+    problem = dbcp.BiconvexProblem(
         cp.Minimize(cp.square(x * y - 1.0)),
-        ([x], [y]),
+        [x],
+        [y],
         [x * y >= 0.5],
     )
+    penalty_prob = problem.penalty_prob
+    penalty_x_prob = problem.penalty_x_prob
+    penalty_y_prob = problem.penalty_y_prob
+    slack_vars = problem.slack_vars
+    if not slack_vars:
+        raise RuntimeError("Penalty-mode release smoke problem did not create slack variables.")
     result = problem.solve(
         solver=cp.SCS,
+        mode="penalty",
         nu=100.0,
         max_iter=10,
-        slack_tolerance=1e-5,
+        slack_tol=slack_tol,
         canon_backend=cp.SCIPY_CANON_BACKEND,
         ignore_dpp=True,
     )
     values = _solution_values(result, x, y)
-    if any(slack.value is None for slack in problem.slack_vars):
-        raise RuntimeError("Relaxed release smoke solve did not return every slack value.")
-    total_slack = sum(float(np.sum(np.abs(slack.value))) for slack in problem.slack_vars)
+    if (
+        problem.penalty_prob is not penalty_prob
+        or problem.penalty_x_prob is not penalty_x_prob
+        or problem.penalty_y_prob is not penalty_y_prob
+        or len(problem.slack_vars) != len(slack_vars)
+        or any(current is not original for current, original in zip(problem.slack_vars, slack_vars))
+    ):
+        raise RuntimeError("Penalty-mode release smoke properties changed during the solve.")
+    if any(slack.value is None for slack in slack_vars):
+        raise RuntimeError("Penalty-mode release smoke solve did not return every slack value.")
+    total_slack = sum(float(np.sum(np.abs(slack.value))) for slack in slack_vars)
     if (
         problem.status != "converge"
         or abs(values[-1]) > 1e-8
-        or values[0] * values[1] < 0.5 - 1e-5
-        or total_slack > 1e-5
+        or values[0] * values[1] < 0.5 - slack_tol
+        or total_slack > slack_tol
     ):
         raise RuntimeError(
-            f"Relaxed release smoke solve failed: status={problem.status!r}, "
+            f"Penalty-mode release smoke solve failed: status={problem.status!r}, "
             f"values={values}, total_slack={total_slack}."
         )
 
@@ -93,7 +110,7 @@ def main() -> int:
 
     _smoke_convolution()
     _smoke_biconvex_problem()
-    _smoke_biconvex_relax_problem()
+    _smoke_biconvex_penalty_mode()
     return 0
 
 

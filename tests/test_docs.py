@@ -14,6 +14,7 @@ from scripts.export_examples import export_examples
 from scripts.stage_docs import documentation_series, stage_documentation_series
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
+README_PATH = REPOSITORY_ROOT / "README.md"
 DOCS_ROOT = REPOSITORY_ROOT / "docs"
 EXAMPLES_ROOT = REPOSITORY_ROOT / "examples"
 AUTODOC_PATTERN = re.compile(
@@ -22,6 +23,10 @@ AUTODOC_PATTERN = re.compile(
     re.MULTILINE,
 )
 EXAMPLE_ROLE_PATTERN = re.compile(r"\{example\}`[^`]*<([^>]+)>`")
+README_QUICKSTART_PATTERN = re.compile(
+    r"^## Quick start\s+.*?^```python\s*\n(?P<source>.*?)^```$",
+    re.MULTILINE | re.DOTALL,
+)
 
 
 def _configuration() -> dict[str, object]:
@@ -75,6 +80,25 @@ def test_documentation_inventory_matches_public_api_and_examples() -> None:
     assert documented == set(dbcp.__all__)
     assert examples
     assert linked_examples == examples
+
+
+def test_readme_quickstart_constructs_without_running_a_numerical_solve(monkeypatch) -> None:
+    match = README_QUICKSTART_PATTERN.search(README_PATH.read_text(encoding="utf-8"))
+    assert match is not None
+    calls = []
+
+    def fake_solve(problem, *args, **kwargs):
+        calls.append((problem, args, kwargs))
+        return 0.0
+
+    monkeypatch.setattr(dbcp.BiconvexProblem, "solve", fake_solve)
+    namespace = {"__name__": "__dbcp_readme_quickstart__"}
+    exec(compile(match.group("source"), f"{README_PATH}:quickstart", "exec"), namespace)
+
+    problem = namespace["problem"]
+    assert isinstance(problem, dbcp.BiconvexProblem)
+    assert problem.is_dbcp()
+    assert calls == [(problem, (), {})]
 
 
 def test_documentation_configuration_uses_current_series_and_relative_links() -> None:

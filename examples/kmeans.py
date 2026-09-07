@@ -94,7 +94,7 @@ def _(BiconvexProblem, cp, k, m, n, xs):
     zs = cp.Variable((m, k), nonneg=True)
     obj = cp.sum(cp.multiply(zs, cp.vstack([cp.sum(cp.square(xs - c), axis=1) for c in xbars]).T))
     constr = [zs <= 1, cp.sum(zs, axis=1) == 1]
-    prob = BiconvexProblem(cp.Minimize(obj), [[xbars], [zs]], constr)
+    prob = BiconvexProblem(cp.Minimize(obj), [xbars], [zs], constr)
     prob.solve()
     return xbars, zs
 

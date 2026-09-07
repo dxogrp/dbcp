@@ -1,10 +1,9 @@
 # Problem modeling
 
-## Variable partition
+## Variable groups
 
-Construct an ordinary CVXPY objective and constraints, then pass exactly two
-variable groups to {class}`dbcp.BiconvexProblem` or
-{class}`dbcp.BiconvexRelaxProblem`:
+Construct an ordinary CVXPY objective and constraints, then pass the two
+variable groups as separate arguments to {class}`dbcp.BiconvexProblem`:
 
 ```python
 x = cp.Variable(n, name="x")
@@ -12,18 +11,20 @@ y = cp.Variable(m, name="y")
 
 problem = dbcp.BiconvexProblem(
     cp.Minimize(cp.sum_squares(A @ x + cp.multiply(B @ y, C @ x) - d)),
-    [[x], [y]],
+    [x],
+    [y],
     constraints,
 )
 ```
 
-The first group contains variables optimized only in the x-subproblem; the
-second contains variables optimized only in the y-subproblem. The two groups
-must be disjoint, but they need not contain every optimization variable. DBCP
-replaces the inactive group's variables with generated CVXPY parameters when
-it constructs each fixed subproblem. A variable omitted from both groups
-remains active in both subproblems, which is valid when both subproblems remain
-DCP.
+The `x_var` argument contains variables optimized only in the x-subproblem;
+`y_var` contains variables optimized only in the y-subproblem. Each argument
+must be an iterable of CVXPY variables, even when it contains only one
+variable. The two groups must be disjoint, but they need not contain every
+optimization variable. DBCP replaces the inactive group's variables with
+generated CVXPY parameters when it constructs each fixed subproblem. A
+variable omitted from both groups remains active in both subproblems, which is
+valid when both subproblems remain DCP.
 
 For example, `Z` can remain outside both groups in the following model:
 
@@ -34,20 +35,21 @@ Z = cp.Variable((m, n))
 
 problem = dbcp.BiconvexProblem(
     cp.Minimize(cp.norm(X @ Y + Z - A, "fro")),
-    [[X], [Y]],
+    [X],
+    [Y],
     [cp.norm(Z, "fro") <= 1],
 )
 ```
 
 Fixing either `X` or `Y` makes the product affine in the other factor, while
 `Z` remains an ordinary variable in both convex subproblems. The grouping is
-part of the model: DBCP neither searches for the groups nor verifies that they
-are disjoint, so disjointness is the caller's responsibility.
+part of the model: DBCP verifies that the supplied groups are disjoint, but it
+does not search for the groups.
 
 (structural-requirements)=
 ## Structural requirements
 
-For the supplied partition, both fixed subproblems must satisfy CVXPY's DCP
+For the supplied groups, both fixed subproblems must satisfy CVXPY's DCP
 rules. In particular:
 
 - the objective must be scalar and may be `cp.Minimize` or `cp.Maximize`;
@@ -63,21 +65,27 @@ generated subproblems.
 DBCP's constraint transformation currently supports CVXPY equality,
 inequality, zero, nonpositive, nonnegative, positive-semidefinite, and
 second-order-cone constraints. A different constraint class can raise
-`TypeError` while the fixed or relaxed problems are being constructed.
+`TypeError` while the fixed or penalty problems are being constructed.
 
 See {doc}`rules` for product compositions and the custom convolution helper.
 
-## Direct and relaxed models
+## Direct and penalty modes
 
-{class}`dbcp.BiconvexProblem` solves the original constraints. If the supplied
+The default `mode="direct"` solves the original constraints. If the supplied
 initial variable values are infeasible, it first performs an alternating
 feasibility search over a slack-relaxed auxiliary problem.
 
-{class}`dbcp.BiconvexRelaxProblem` instead retains slacks during the main solve
-and penalizes their total magnitude. This is useful when maintaining exact
-feasibility at every alternating step is difficult. Its status distinguishes
-solutions that satisfy the original constraints from those with residual
-slack.
+With `mode="penalty"`, {class}`dbcp.BiconvexProblem` instead retains slacks
+during the main solve and penalizes their total magnitude. This is useful when
+maintaining exact feasibility at every alternating step is difficult. Its
+status distinguishes solutions that satisfy the original constraints from
+those with residual slack.
+
+For inspection, `x_prob` and `y_prob` expose the two direct fixed
+subproblems. The `penalty_prob`, `penalty_x_prob`, `penalty_y_prob`, and
+`slack_vars` properties lazily construct the penalty formulation, its fixed
+subproblems, and its tuple of slack variables. Each property returns the same
+object on repeated access.
 
 ## Variables, parameters, and initial values
 

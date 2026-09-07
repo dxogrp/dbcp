@@ -30,7 +30,8 @@ Y = cp.Variable((k, n), nonneg=True, name="Y")
 
 problem = dbcp.BiconvexProblem(
     cp.Minimize(cp.sum_squares(X @ Y - A)),
-    [[X], [Y]],
+    [X],
+    [Y],
 )
 
 assert problem.is_dbcp()
@@ -41,7 +42,7 @@ print("objective =", value)
 print("reconstruction error =", np.linalg.norm(X.value @ Y.value - A, "fro") ** 2)
 ```
 
-The two inner lists define the variable partition. During the x-subproblem,
+The two list arguments define the variable groups. During the x-subproblem,
 DBCP optimizes `X` while holding `Y` fixed; during the y-subproblem it does the
 reverse. The original CVXPY variables receive the final numerical values.
 

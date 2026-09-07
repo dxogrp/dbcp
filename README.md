@@ -37,10 +37,10 @@ products between expressions from the two variable blocks. A model is accepted
 when fixing either supplied block produces a DCP-compliant CVXPY problem.
 
 DBCP solves accepted models with proximal alternating convex search.
-`BiconvexProblem` works with the original constraints, while
-`BiconvexRelaxProblem` introduces and penalizes constraint slacks to permit
-infeasible iterates. The [user guide](https://dxogrp.github.io/dbcp/) describes
-the modeling rules, solution method, and result statuses in detail.
+`BiconvexProblem.solve()` uses the original constraints by default; its
+`mode="penalty"` option instead introduces and penalizes constraint slacks to
+permit infeasible iterates. The [user guide](https://dxogrp.github.io/dbcp/)
+describes the modeling rules, solution methods, and result statuses in detail.
 
 ## Installation
 
@@ -88,19 +88,24 @@ import numpy as np
 
 import dbcp
 
+rng = np.random.default_rng(10015)
+m, n, k = 5, 10, 3
+A = rng.random((m, k)) @ rng.random((k, n))
+
 X = cp.Variable((m, k), nonneg=True, name="X")
 Y = cp.Variable((k, n), nonneg=True, name="Y")
 
 problem = dbcp.BiconvexProblem(
     cp.Minimize(cp.sum_squares(X @ Y - A)),
-    [[X], [Y]],
+    [X],
+    [Y],
 )
 
 assert problem.is_dbcp()
 value = problem.solve()
 ```
 
-The two inner lists define the variable partition. DBCP alternately optimizes
+The two list arguments define the variable groups. DBCP alternately optimizes
 one group while holding the other fixed, and writes the result into the
 original CVXPY variables.
 

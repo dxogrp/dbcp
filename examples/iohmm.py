@@ -24,7 +24,7 @@ def _():
     import matplotlib.pyplot as plt
     import numpy as np
 
-    from dbcp import BiconvexRelaxProblem
+    from dbcp import BiconvexProblem
 
     _example_directory = Path(__file__).resolve().parent
     plt.style.use(_example_directory / "zhlatex.mplstyle")
@@ -32,7 +32,7 @@ def _():
     figure_directory.mkdir(parents=True, exist_ok=True)
 
     np.random.seed(10015)
-    return BiconvexRelaxProblem, cp, figure_directory, mo, np, plt
+    return BiconvexProblem, cp, figure_directory, mo, np, plt
 
 
 @app.cell(hide_code=True)
@@ -166,7 +166,7 @@ def _(mo):
 
 
 @app.cell
-def _(BiconvexRelaxProblem, K, cp, m, n, xs, ys):
+def _(BiconvexProblem, K, cp, m, n, xs, ys):
     thetas = cp.Variable((K, n))
     zs = cp.Variable((m, K), nonneg=True)
 
@@ -188,8 +188,8 @@ def _(BiconvexRelaxProblem, K, cp, m, n, xs, ys):
         cp.sum(zs, axis=1) == 1,
     ]
 
-    prob = BiconvexRelaxProblem(obj, ([zs], [thetas]), constr)
-    prob.solve(solver=cp.CLARABEL, nu=1e3, lbd=0.1, abs_tol=1e-3)
+    prob = BiconvexProblem(obj, [zs], [thetas], constr)
+    prob.solve(solver=cp.CLARABEL, mode="penalty", nu=1e3, lbd=0.1, abs_tol=1e-3)
     return thetas, zs
 
 

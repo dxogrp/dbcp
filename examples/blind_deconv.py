@@ -122,7 +122,7 @@ def _(BiconvexProblem, convolve, cp, d, m, n):
         cp.sum_squares(convolve(x, y) - d) + alpha_sp * cp.norm1(x) + alpha_sm * cp.sum_squares(cp.diff(y))
     )
     constr = [cp.norm(y, "inf") <= beta]
-    prob = BiconvexProblem(obj, [[x], [y]], constr)
+    prob = BiconvexProblem(obj, [x], [y], constr)
     prob.solve(cp.CLARABEL, abs_tol=1e-5, max_iter=200)
     return x, y
 

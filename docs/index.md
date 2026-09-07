@@ -27,11 +27,10 @@ DBCP solves accepted models using proximal alternating convex search. Each
 iteration solves one convex subproblem with the other block fixed. See
 {doc}`solving` for the algorithm and the interpretation of its stopping test.
 
-Use {class}`dbcp.BiconvexProblem` when the original constraints should be
-satisfied throughout the alternating solve. Use
-{class}`dbcp.BiconvexRelaxProblem` to introduce and penalize constraint slacks,
-which permits infeasible iterates and reports whether the final point is
-feasible for the original model.
+{class}`dbcp.BiconvexProblem` uses the original constraints with the default
+`mode="direct"`. Select `mode="penalty"` to introduce and penalize
+constraint slacks, which permits infeasible iterates and reports whether the
+final point is feasible for the original model.
 
 ```{toctree}
 :hidden:

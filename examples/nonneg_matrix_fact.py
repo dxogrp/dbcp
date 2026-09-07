@@ -79,7 +79,7 @@ def _(A, BiconvexProblem, cp, k, m, n):
     Y = cp.Variable((k, n), nonneg=True)
 
     obj = cp.Minimize(cp.sum_squares(X @ Y - A))
-    prob = BiconvexProblem(obj, [[X], [Y]])
+    prob = BiconvexProblem(obj, [X], [Y])
     prob.solve()
     return
 
