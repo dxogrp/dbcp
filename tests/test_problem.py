@@ -1,5 +1,6 @@
 import inspect
 import warnings
+from types import SimpleNamespace
 
 import cvxpy as cp
 import numpy as np
@@ -8,7 +9,7 @@ import pytest
 import dbcp
 import dbcp.problem as problem_module
 from dbcp import BiconvexProblem
-from dbcp.error import InitiationError
+from dbcp.error import InitiationError, SolveError
 from dbcp.problem import _objective_gap_within_tolerance
 
 
@@ -338,12 +339,12 @@ def test_penalty_inspection_properties_are_lazy_and_stable(monkeypatch):
     [
         pytest.param(False, True, "converge", id="zero-slack-converged"),
         pytest.param(False, False, "converge_inaccurate", id="zero-slack-max-iterations"),
-        pytest.param(True, True, "converge_infeasible", id="positive-slack-converged"),
+        pytest.param(True, True, "converge_with_slack", id="excess-slack-converged"),
         pytest.param(
             True,
             False,
-            "converge_inaccurate_infeasible",
-            id="positive-slack-max-iterations",
+            "converge_inaccurate_with_slack",
+            id="excess-slack-max-iterations",
         ),
     ],
 )
@@ -372,17 +373,68 @@ def test_penalty_status_uses_inclusive_zero_slack_boundary(
         )
 
     total_slack = sum(float(np.sum(np.abs(slack.value))) for slack in problem.slack_vars)
-    infeasibility_warnings = [
-        warning for warning in caught_warnings if "returned solution is infeasible" in str(warning.message)
+    slack_warnings = [
+        warning for warning in caught_warnings if "returned solution has total slack" in str(warning.message)
     ]
     if positive_slack:
         assert total_slack > 0
-        assert len(infeasibility_warnings) == 1
-        assert ". Consider increasing 'nu'" in str(infeasibility_warnings[0].message)
+        assert len(slack_warnings) == 1
+        warning_message = str(slack_warnings[0].message)
+        assert f"total slack {total_slack}" in warning_message
+        assert "slack_tol=0.0" in warning_message
+        assert ". Consider increasing 'nu'" in warning_message
+        assert "infeasible" not in warning_message
     else:
         assert total_slack == 0
     assert problem.status == expected_status
-    assert bool(infeasibility_warnings) is ("infeasible" in expected_status)
+    assert bool(slack_warnings) is ("with_slack" in expected_status)
+
+
+def test_penalty_status_allows_positive_slack_within_tolerance():
+    problem, *_ = _make_inconsistent_problem()
+
+    with warnings.catch_warnings(record=True) as caught_warnings:
+        warnings.simplefilter("always")
+        problem.solve(
+            cp.CLARABEL,
+            abs_tol=1e6,
+            mode="penalty",
+            slack_tol=2.0,
+        )
+
+    total_slack = sum(float(np.sum(np.abs(slack.value))) for slack in problem.slack_vars)
+    slack_warnings = [
+        warning for warning in caught_warnings if "returned solution has total slack" in str(warning.message)
+    ]
+
+    assert 0 < total_slack <= 2.0
+    assert problem.status == "converge"
+    assert not slack_warnings
+
+
+@pytest.mark.parametrize("nonfinite_slack", [np.nan, np.inf, -np.inf])
+def test_penalty_mode_rejects_nonfinite_computed_total_slack(monkeypatch, nonfinite_slack):
+    problem = _make_unconstrained_problem()
+    problem.solve(cp.CLARABEL, abs_tol=1e6, mode="penalty")
+    assert problem.status == "converge"
+    assert problem.value is not None
+
+    monkeypatch.setattr(
+        problem,
+        "_penalty_slack_vars",
+        (SimpleNamespace(id=-1, value=nonfinite_slack),),
+    )
+    with warnings.catch_warnings(record=True) as caught_warnings:
+        warnings.simplefilter("always")
+        with pytest.raises(SolveError, match="non-finite total slack"):
+            problem.solve(cp.CLARABEL, abs_tol=1e6, mode="penalty")
+
+    slack_warnings = [
+        warning for warning in caught_warnings if "returned solution has total slack" in str(warning.message)
+    ]
+    assert problem.status is None
+    assert problem.value is None
+    assert not slack_warnings
 
 
 def test_penalty_mode_returns_original_objective_only():
@@ -393,7 +445,7 @@ def test_penalty_mode_returns_original_objective_only():
     penalty_y_prob = problem.penalty_y_prob
     slack_vars = problem.slack_vars
 
-    with pytest.warns(UserWarning, match="returned solution is infeasible"):
+    with pytest.warns(UserWarning, match="returned solution has total slack"):
         returned_value = problem.solve(
             cp.CLARABEL,
             lbd=lbd,
@@ -424,7 +476,7 @@ def test_failed_direct_solve_can_retry_with_penalty_mode():
 
     assert problem.status is None
     assert problem.value is None
-    with pytest.warns(UserWarning, match="returned solution is infeasible"):
+    with pytest.warns(UserWarning, match="returned solution has total slack"):
         value = problem.solve(
             cp.CLARABEL,
             abs_tol=1e6,
@@ -434,7 +486,7 @@ def test_failed_direct_solve_can_retry_with_penalty_mode():
         )
 
     assert value is not None
-    assert problem.status == "converge_infeasible"
+    assert problem.status == "converge_with_slack"
 
 
 @pytest.mark.parametrize("mode", ["relaxed", "DIRECT", None, 1])
@@ -459,13 +511,22 @@ def test_direct_mode_rejects_explicit_penalty_only_options(option, value):
         problem.solve(mode="direct", **{option: value})
 
 
-@pytest.mark.parametrize("option", ["nu", "slack_tol"])
-@pytest.mark.parametrize("invalid_value", [-1e-6, np.nan, np.inf, -np.inf, "invalid"])
-def test_penalty_mode_rejects_invalid_numeric_options(option, invalid_value):
+@pytest.mark.parametrize("invalid_value", [0, -1e-6, np.nan, np.inf, -np.inf, "invalid"])
+def test_penalty_mode_rejects_invalid_nu(invalid_value):
     problem = _make_problem()
 
-    with pytest.raises(ValueError, match=rf"{option} must be finite and nonnegative"):
-        problem.solve(mode="penalty", **{option: invalid_value})
+    with pytest.raises(ValueError) as error:
+        problem.solve(mode="penalty", nu=invalid_value)
+
+    assert str(error.value) == "nu must be finite and positive."
+
+
+@pytest.mark.parametrize("invalid_value", [-1e-6, np.nan, np.inf, -np.inf, "invalid"])
+def test_penalty_mode_rejects_invalid_slack_tolerance(invalid_value):
+    problem = _make_problem()
+
+    with pytest.raises(ValueError, match="slack_tol must be finite and nonnegative"):
+        problem.solve(mode="penalty", slack_tol=invalid_value)
 
 
 def test_solve_rejects_legacy_slack_tolerance():

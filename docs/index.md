@@ -29,8 +29,10 @@ iteration solves one convex subproblem with the other block fixed. See
 
 {class}`dbcp.BiconvexProblem` uses the original constraints with the default
 `mode="direct"`. Select `mode="penalty"` to introduce and penalize
-constraint slacks, which permits infeasible iterates and reports whether the
-final point is feasible for the original model.
+constraint slacks, which permits infeasible iterates and classifies the final
+total slack relative to `slack_tol`. A penalty status without `_with_slack`
+means only that total slack is at or below this tolerance; it does not certify
+exact feasibility for the original model.
 
 ```{toctree}
 :hidden:

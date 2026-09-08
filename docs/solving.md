@@ -55,9 +55,10 @@ alternating CVXPY subproblem solve. They are not applied to the auxiliary
 feasible-initialization solves; `proj_max_iter` instead controls that search's
 iteration limit.
 
-In penalty mode, omitting `nu` and `slack_tol` gives the effective defaults
-`nu=1` and `slack_tol=1e-6`. These options apply only to penalty mode;
-explicitly supplying either one in direct mode is rejected.
+In penalty mode, omitting `nu` or `slack_tol`, or explicitly passing `None`,
+gives the effective defaults `nu=1` and `slack_tol=1e-6`. The penalty parameter
+`nu` must be finite and strictly positive. These options apply only to penalty
+mode; a non-`None` value for either one is rejected in direct mode.
 
 Note that alternating convex search is a local heuristic.
 Its objective-gap stopping test, including a `converge`
@@ -90,8 +91,9 @@ $$
 f_0(x,y)+\nu\left(\mathbf{1}^T s+\lVert t\rVert_1\right),
 $$
 
-while maximization subtracts the same penalty. Set `nu` in `solve()`; a larger
-value places more emphasis on satisfying the original constraints.
+while maximization subtracts the same penalty. Set `nu` in `solve()`; it must
+be strictly positive, and a larger value places more emphasis on satisfying the
+original constraints.
 
 ```python
 value = problem.solve(
@@ -104,9 +106,10 @@ value = problem.solve(
 )
 ```
 
-The point is classified as feasible when the final sum of absolute slack
-values is less than or equal to `slack_tol`, and as infeasible otherwise. See
-{doc}`results` for every status.
+When the final sum of absolute slack values is above `slack_tol`, the status
+ends in `_with_slack`; equality with the tolerance is accepted. This status
+describes the returned relaxed point and does not establish that the original
+problem is infeasible. See {doc}`results` for every status.
 
 ## Continuing from an existing point
 

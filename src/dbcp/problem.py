@@ -24,6 +24,16 @@ def _validate_tolerance(name: str, value: float) -> None:
         raise ValueError(f"{name} must be finite and nonnegative.")
 
 
+def _validate_positive_penalty(value: float) -> None:
+    """Validate the penalty parameter."""
+    try:
+        is_valid = bool(np.isfinite(value)) and value > 0
+    except (TypeError, ValueError):
+        is_valid = False
+    if not is_valid:
+        raise ValueError("nu must be finite and positive.")
+
+
 def _objective_gap_within_tolerance(
     u: float,
     v: float,
@@ -261,11 +271,13 @@ class BiconvexProblem(cp.Problem):
             The solution mode. Direct mode finds a feasible initial point; penalty
             mode adds penalized slacks and permits an infeasible start.
         nu : float | None
-            The penalty applied to total slack in penalty mode. The effective
-            default is 1. This option is invalid in direct mode.
+            The finite, strictly positive penalty applied to total slack in penalty
+            mode. The effective default is 1. A non-None value is invalid in direct
+            mode; None is equivalent to omission.
         slack_tol : float | None
             The total-slack tolerance in penalty mode. The effective default is
-            1e-6. This option is invalid in direct mode.
+            1e-6. A non-None value is invalid in direct mode; None is equivalent to
+            omission.
         *args
             Additional positional arguments forwarded to each alternating
             subproblem solve, but not to feasible initialization.
@@ -297,7 +309,7 @@ class BiconvexProblem(cp.Problem):
         if is_penalty:
             penalty_nu = 1 if nu is None else nu
             penalty_slack_tol = 1e-6 if slack_tol is None else slack_tol
-            _validate_tolerance("nu", penalty_nu)
+            _validate_positive_penalty(penalty_nu)
             _validate_tolerance("slack_tol", penalty_slack_tol)
         else:
             invalid_options = [name for name, value in (("nu", nu), ("slack_tol", slack_tol)) if value is not None]
@@ -372,6 +384,7 @@ class BiconvexProblem(cp.Problem):
             yprox_prob = y_prob - y_prox
         i = 0
         total_slack = 0.0
+        has_excess_slack = False
         try:
             while True:
                 self._update_fixed_values(x_prob, self.fix_vars[1])
@@ -394,6 +407,9 @@ class BiconvexProblem(cp.Problem):
                 gap = np.abs(xvalue - yvalue)
                 if is_penalty:
                     total_slack = float(np.sum([np.sum(np.abs(slack.value)) for slack in slack_vars]))
+                    if not np.isfinite(total_slack):
+                        raise SolveError("Solver returned non-finite total slack.")
+                    has_excess_slack = total_slack > penalty_slack_tol
                     print(f"{i:<7} {xvalue:<20.9f} {yvalue:<20.9f} {gap:<20.4e} {total_slack:<20.4e} ")
                 else:
                     print(f"{i:<7} {xvalue:<20.9f} {yvalue:<20.9f} {gap:<10.4e}")
@@ -404,10 +420,7 @@ class BiconvexProblem(cp.Problem):
                     rel_tol,
                 ):
                     if is_penalty:
-                        if total_slack <= penalty_slack_tol:
-                            self._status = "converge"
-                        else:
-                            self._status = "converge_infeasible"
+                        self._status = "converge_with_slack" if has_excess_slack else "converge"
                     else:
                         self._status = "converge"
                     break
@@ -415,10 +428,7 @@ class BiconvexProblem(cp.Problem):
                     i += 1
                 if i == max_iter:
                     if is_penalty:
-                        if total_slack <= penalty_slack_tol:
-                            self._status = "converge_inaccurate"
-                        else:
-                            self._status = "converge_inaccurate_infeasible"
+                        self._status = "converge_inaccurate_with_slack" if has_excess_slack else "converge_inaccurate"
                     else:
                         self._status = "converge_inaccurate"
                     break
@@ -429,10 +439,10 @@ class BiconvexProblem(cp.Problem):
         print(f"Terminated with status: {self.status}.")
         print("=" * 85)
         self._value = self.objective.value
-        if is_penalty and self.status is not None and "infeasible" in self.status:
+        if is_penalty and has_excess_slack:
             warnings.warn(
-                f"The returned solution is infeasible with total constraint violation {total_slack}. "
-                "Consider increasing 'nu' value or trying another initial point."
+                f"The returned solution has total slack {total_slack}, which exceeds slack_tol={penalty_slack_tol}. "
+                "Consider increasing 'nu' or trying another initial point."
             )
         return self.value
 

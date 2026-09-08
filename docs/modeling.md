@@ -78,8 +78,9 @@ feasibility search over a slack-relaxed auxiliary problem.
 With `mode="penalty"`, {class}`dbcp.BiconvexProblem` instead retains slacks
 during the main solve and penalizes their total magnitude. This is useful when
 maintaining exact feasibility at every alternating step is difficult. Its
-status distinguishes solutions that satisfy the original constraints from
-those with residual slack.
+status distinguishes results whose total slack is within `slack_tol` from
+those with excess slack. Excess slack describes the returned relaxed point; it
+does not establish that the original problem is infeasible.
 
 For inspection, `x_prob` and `y_prob` expose the two direct fixed
 subproblems. The `penalty_prob`, `penalty_x_prob`, `penalty_y_prob`, and

@@ -31,19 +31,21 @@ to strengthen the proximal regularization.
 
 ## The solve reaches the iteration limit
 
-`converge_inaccurate` means the objective-gap stopping test was not met within
-`max_iter`. Inspect the variable values and objective, then consider another
-starting point, a larger iteration budget, or a different `lbd`. If the
-objective is near zero, adjust `abs_tol`; if its magnitude is large,
-adjust `rel_tol`. Calling `solve()` again continues from the current
-variable values.
+`converge_inaccurate` and `converge_inaccurate_with_slack` mean the
+objective-gap stopping test was not met within `max_iter`. The `_with_slack`
+suffix additionally means that the final total slack exceeds `slack_tol`.
+Inspect the variable values and objective, then consider another starting
+point, a larger iteration budget, or a different `lbd`. If the objective is
+near zero, adjust `abs_tol`; if its magnitude is large, adjust `rel_tol`.
+Calling `solve()` again continues from the current variable values.
 
-## A penalty-mode solution remains infeasible
+## A penalty-mode result has excess slack
 
-Statuses containing `infeasible` mean the total absolute slack is greater than
-`slack_tol`. Increase `nu` to penalize slack more heavily, initialize
-closer to the original feasible set, or reconsider whether the constraints are
-jointly feasible.
+Statuses ending in `_with_slack` mean the total absolute slack is greater than
+`slack_tol`. This does not establish that the original problem is infeasible.
+Inspect the original constraint residuals, then consider increasing the
+strictly positive `nu`, initializing closer to the original feasible set, or
+using another convex solver.
 
 ## CVXPY reports a non-DPP or canonicalization-backend warning
 
