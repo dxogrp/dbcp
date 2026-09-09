@@ -7,7 +7,8 @@ paper.
 @article{zhu2025dbcp,
   title={Disciplined Biconvex Programming},
   author={Zhu, H. and Boedecker, J.},
-  journal={arXiv Preprint arXiv:2511.01813},
+  journal={arXiv},
+  volume={2511.01813},
   year={2025},
 }
 ```

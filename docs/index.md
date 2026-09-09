@@ -17,22 +17,14 @@ the objective and inequality constraint functions are convex in $x$ and
 the equality constraint functions are affine in $x$. The same conditions
 hold in $y$ when $x$ is fixed.
 
-## Disciplined biconvex programming
-
 DBCP extends CVXPY's disciplined convex programming rules with structured
 products between expressions from the two variable blocks. A model is accepted
 when fixing either supplied block produces a [DCP](https://www.cvxpy.org/tutorial/dcp/index.html)-compliant CVXPY problem.
+See the {ref}`DBCP modeling rules <dbcp-rules>` for the complete requirements.
 
 DBCP solves accepted models using proximal alternating convex search. Each
 iteration solves one convex subproblem with the other block fixed. See
 {doc}`solving` for the algorithm and the interpretation of its stopping test.
-
-{class}`dbcp.BiconvexProblem` uses the original constraints with the default
-`mode="direct"`. Select `mode="penalty"` to introduce and penalize
-constraint slacks, which permits infeasible iterates and classifies the final
-total slack relative to `slack_tol`. A penalty status without `_with_slack`
-means only that total slack is at or below this tolerance; it does not certify
-exact feasibility for the original model.
 
 ```{toctree}
 :hidden:
@@ -41,7 +33,6 @@ exact feasibility for the original model.
 installation
 quickstart
 modeling
-rules
 solving
 results
 examples

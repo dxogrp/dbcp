@@ -1,99 +1,68 @@
 # Solving
 
-## Proximal alternating convex search
+Let $x$ and $y$ denote the two variable blocks supplied to
+{class}`dbcp.BiconvexProblem`, and let $f_0(x,y)$ denote the original modeled
+objective. {meth}`dbcp.BiconvexProblem.solve` provides two solution modes. The
+default, `mode="direct"`, enforces the original constraints and searches for a
+feasible starting point when necessary. `mode="penalty"` instead relaxes the
+constraints with penalized slack variables and permits infeasible iterates.
+After this mode-specific setup, both modes use proximal alternating convex
+search.
 
-Let $x$ and $y$ denote the two variable blocks. Given the current point
-$(x^{(k)},y^{(k)})$, DBCP alternates between convex subproblems of the schematic form
+## Initial values
 
-$$
-x^{(k+1)}\in\mathop{\rm argmin}_x
-f_0(x,y^{(k)})+\lambda\|x-x^{(k)}\|_F^2
-$$
+Both solve modes retain existing variable `.value` arrays as their initial
+point. When a value is missing, DBCP draws a standard-normal array and projects
+it through the variable's CVXPY attributes. Assign all variable values
+explicitly when reproducible initialization is important.
 
-and
+## Direct mode and feasible initialization
 
-$$
-y^{(k+1)}\in\mathop{\rm argmin}_y
-f_0(x^{(k+1)},y)+\lambda\|y-y^{(k)}\|_F^2,
-$$
-
-with the analogous sign adjustment for a maximization objective. The
-regularization parameter is the `lbd` solve argument. The proximal terms make
-each half-step prefer points near the preceding iterate.
-
-After each pair of solves, DBCP evaluates the two fixed-subproblem objectives
-without their proximal terms. With `mode="direct"`, these are the original
-objective; with `mode="penalty"`, they also contain the weighted slack
-penalty. Let these objective values be $u$ and $v$. DBCP stops when
-
-$$
-|u-v| \leq \epsilon_{\mathrm{abs}}
-  + \epsilon_{\mathrm{rel}}\max\{|u|,|v|\},
-$$
-
-or after `max_iter` iterations. The solve arguments `abs_tol` and
-`rel_tol` specify $\epsilon_{\mathrm{abs}}$ and
-$\epsilon_{\mathrm{rel}}$, respectively.
-
-```python
-value = problem.solve(
-    solver=cp.CLARABEL,
-    lbd=0.5,
-    max_iter=200,
-    abs_tol=1e-7,
-    rel_tol=1e-6,
-)
-```
-
-The default solver is `cp.SCS`, `lbd=0.1`, `max_iter=100`, and
-`abs_tol=rel_tol=1e-6`. `abs_tol` may be passed
-positionally, whereas `rel_tol` is keyword-only. Setting the latter
-to zero gives an absolute-only stopping criterion. The `mode` keyword selects
-DBCP's algorithm. In particular, `method` is not a DBCP selector: it and all
-other additional positional and keyword arguments are passed to each
-alternating CVXPY subproblem solve. They are not applied to the auxiliary
-feasible-initialization solves; `proj_max_iter` instead controls that search's
-iteration limit.
-
-In penalty mode, omitting `nu` or `slack_tol`, or explicitly passing `None`,
-gives the effective defaults `nu=1` and `slack_tol=1e-6`. The penalty parameter
-`nu` must be finite and strictly positive. These options apply only to penalty
-mode; a non-`None` value for either one is rejected in direct mode.
-
-Note that alternating convex search is a local heuristic.
-Its objective-gap stopping test, including a `converge`
-status, is **not** a certificate of global optimality.
-
-## Feasible initialization
-
-Before a `mode="direct"` solve, every unset variable is randomly initialized
-and projected through its CVXPY attributes. If all constraints are satisfied,
-ACS starts immediately.
+Direct mode is selected with `mode="direct"` or by omitting `mode`. It solves
+the original constraints and checks whether the initial point satisfies all of
+them. If it does, alternating convex search starts immediately.
 
 Otherwise, DBCP adds temporary slacks to the constraints and alternately
 minimizes their total one-norm until the original constraints are satisfied.
 If this search cannot find a feasible point within its internal iteration
 limit, it raises `dbcp.error.InitiationError`.
 
-Supplying feasible `.value` arrays before solving avoids random initialization
-and can improve repeatability.
+The direct-only `proj_max_iter` keyword controls the feasibility search's
+iteration limit and defaults to `10`. DBCP consumes this keyword rather than
+passing it to CVXPY. It has no effect in penalty mode.
 
 ## Penalty mode
 
-Calling {meth}`dbcp.BiconvexProblem.solve` with `mode="penalty"` introduces
-nonnegative slacks $s$ for inequality constraints and unrestricted slacks $t$
-for equality constraints. It skips feasible initialization, so the alternating
-solve may start and remain infeasible for the original constraints. This is the
-paper's slack-relaxed, infeasible-start ACS procedure. For
-minimization, it solves a penalized objective of the form
+Calling {meth}`dbcp.BiconvexProblem.solve` with `mode="penalty"` introduces a
+slack variable for each original constraint. Slacks for equality and zero
+constraints are unrestricted; slacks for the other {ref}`supported constraint
+families <supported-constraints>` are nonnegative. Let $\mathcal{S}$ denote the
+collection of generated slack variables. Penalty mode skips feasible
+initialization, so the alternating solve may start and remain infeasible for
+the original constraints. The total slack is
 
 $$
-f_0(x,y)+\nu\left(\mathbf{1}^T s+\lVert t\rVert_1\right),
+S = \sum_{s\in\mathcal{S}} \lVert s\rVert_1.
 $$
 
-while maximization subtracts the same penalty. Set `nu` in `solve()`; it must
-be strictly positive, and a larger value places more emphasis on satisfying the
-original constraints.
+Let $\nu$ denote the `nu` argument, the weight applied to $S$. It must be finite
+and strictly positive; its effective default is `1`. For minimization, penalty
+mode uses the objective
+
+$$
+f_0(x,y)+\nu S,
+$$
+
+while maximization subtracts the same penalty. A larger `nu` places more
+emphasis on satisfying the original constraints.
+
+The `slack_tol` argument is the finite, nonnegative threshold used to classify
+the returned total slack; its effective default is `1e-6`. Omitting `nu` or
+`slack_tol`, or explicitly passing `None`, selects its effective default.
+These arguments apply only to penalty mode, and direct mode rejects a
+non-`None` value for either one.
+
+The following example uses penalty mode for solving a biconvex problem:
 
 ```python
 value = problem.solve(
@@ -107,9 +76,77 @@ value = problem.solve(
 ```
 
 When the final sum of absolute slack values is above `slack_tol`, the status
-ends in `_with_slack`; equality with the tolerance is accepted. This status
-describes the returned relaxed point and does not establish that the original
-problem is infeasible. See {doc}`results` for every status.
+ends in `_with_slack`; equality with the tolerance is accepted.
+See {doc}`results` for all possible statuses.
+
+## Proximal alternating convex search
+
+Let $\lambda$ denote the nonnegative proximal weight supplied through `lbd`.
+Given the current point $(x^{(k)},y^{(k)})$, direct mode alternates between
+convex subproblems of the schematic form
+
+$$
+x^{(k+1)}\in\mathop{\rm argmin}_x
+f_0(x,y^{(k)})+\lambda\|x-x^{(k)}\|_F^2
+$$
+
+and
+
+$$
+y^{(k+1)}\in\mathop{\rm argmin}_y
+f_0(x^{(k+1)},y)+\lambda\|y-y^{(k)}\|_F^2,
+$$
+
+with the analogous sign adjustment for a maximization objective. The proximal
+terms make each half-step prefer points near the preceding iterate. Penalty
+mode uses the same alternating structure with its penalized objective and
+jointly optimizes the slack variables in each half-step; the slack variables
+do not receive proximal terms.
+
+After each pair of solves, DBCP evaluates the two fixed-subproblem objectives
+without their proximal terms. Let $u$ and $v$ denote these objective values.
+They come from the original objective in direct mode and include the weighted
+slack penalty in penalty mode. Let $\epsilon_{\mathrm{abs}}$ and
+$\epsilon_{\mathrm{rel}}$ be the absolute and relative tolerances supplied
+through `abs_tol` and `rel_tol`, respectively. DBCP stops when
+
+$$
+|u-v| \leq \epsilon_{\mathrm{abs}}
+  + \epsilon_{\mathrm{rel}}\max\{|u|,|v|\},
+$$
+
+or after `max_iter` iterations.
+
+### Arguments shared by both modes
+
+```python
+value = problem.solve(
+    solver=cp.CLARABEL,
+    lbd=0.5,
+    max_iter=200,
+    abs_tol=1e-7,
+    rel_tol=1e-6,
+)
+```
+
+The default solver is `cp.SCS`, `lbd=0.1`, `max_iter=100`, and
+`abs_tol=rel_tol=1e-6`. `abs_tol` may be passed positionally, whereas
+`rel_tol` is keyword-only. Setting `rel_tol` to zero gives an absolute-only
+stopping criterion. Additional positional and keyword arguments are passed to
+each alternating CVXPY subproblem solve, but not to the auxiliary direct-mode
+feasibility solves.
+
+Note that alternating convex search is a local heuristic. Its objective-gap
+stopping test, including a `converge` status, is **not** a certificate of
+global optimality.
+
+## Inspecting generated subproblems
+
+The `x_prob` and `y_prob` properties expose the two direct fixed subproblems.
+The `penalty_prob`, `penalty_x_prob`, `penalty_y_prob`, and `slack_vars`
+properties lazily construct the penalty formulation, its fixed subproblems,
+and its tuple of slack variables. Each property returns the same object on
+repeated access. See the {doc}`api` for the complete public interface.
 
 ## Continuing from an existing point
 

@@ -42,12 +42,17 @@ problem = dbcp.BiconvexProblem(
 ```
 
 Fixing either `X` or `Y` makes the product affine in the other factor, while
-`Z` remains an ordinary variable in both convex subproblems. The grouping is
-part of the model: DBCP verifies that the supplied groups are disjoint, but it
-does not search for the groups.
+`Z` remains an ordinary variable in both convex subproblems.
+
+(dbcp-rules)=
+## DBCP rules
+
+DBCP inherits CVXPY's expression syntax and DCP rules within each fixed
+subproblem. Its additional modeling pattern is multiplication between
+expressions that depend on different variable blocks.
 
 (structural-requirements)=
-## Structural requirements
+### Structural requirements
 
 For the supplied groups, both fixed subproblems must satisfy CVXPY's DCP
 rules. In particular:
@@ -59,36 +64,78 @@ rules. In particular:
 - every inequality must be DCP in both fixed problems; and
 - every equality must be affine in both fixed problems.
 
-Call {meth}`dbcp.BiconvexProblem.is_dbcp` after construction to check the two
-generated subproblems.
+Call {meth}`dbcp.BiconvexProblem.is_dbcp` after construction to check this
+operational condition. The method checks the two generated subproblems; it
+does not separately traverse products to enforce the formal two-block
+assignment rule described below.
 
-DBCP's constraint transformation currently supports CVXPY equality,
-inequality, zero, nonpositive, nonnegative, positive-semidefinite, and
-second-order-cone constraints. A different constraint class can raise
-`TypeError` while the fixed or penalty problems are being constructed.
+(product-compositions)=
+### Product compositions
 
-See {doc}`rules` for product compositions and the custom convolution helper.
+Products with a constant or parameter factor follow the ordinary DCP rules.
+When both factors contain variables, the DBCP syntax described by the
+[accompanying paper](https://haozhu10015.github.io/papers/dbcp.html) permits
+the following curvature and sign combinations:
 
-## Direct and penalty modes
+```{list-table}
+:header-rows: 1
+:widths: 42 42 16
 
-The default `mode="direct"` solves the original constraints. If the supplied
-initial variable values are infeasible, it first performs an alternating
-feasibility search over a slack-relaxed auxiliary problem.
+* - First factor
+  - Second factor
+  - Product role
+* - Affine
+  - Affine
+  - Biaffine
+* - Nonnegative affine
+  - Convex
+  - Biconvex
+* - Nonpositive affine
+  - Concave
+  - Biconvex
+* - Nonnegative convex
+  - Nonnegative convex
+  - Biconvex
+* - Nonpositive concave
+  - Nonpositive concave
+  - Biconvex
+```
 
-With `mode="penalty"`, {class}`dbcp.BiconvexProblem` instead retains slacks
-during the main solve and penalizes their total magnitude. This is useful when
-maintaining exact feasibility at every alternating step is difficult. Its
-status distinguishes results whose total slack is within `slack_tol` from
-those with excess slack. Excess slack describes the returned relaxed point; it
-does not establish that the original problem is infeasible.
+The factors may be exchanged. Their signs and curvatures must be known to
+CVXPY; numerical values alone do not establish a symbolic sign.
 
-For inspection, `x_prob` and `y_prob` expose the two direct fixed
-subproblems. The `penalty_prob`, `penalty_x_prob`, `penalty_y_prob`, and
-`slack_vars` properties lazily construct the penalty formulation, its fixed
-subproblems, and its tuple of slack variables. Each property returns the same
-object on repeated access.
+The formal DBCP product rule requires one consistent assignment of the
+relevant variables to two blocks across the objective and all constraints. In
+every product whose two factors both contain variables, one factor may contain
+variables only from one block and the other only from the other block. This
+prevents expressions like `x * y`, `y * z`, and `z * x` from appearing
+simultaneously in the same problem: the first two products require `x` and `z`
+to share a block, while the last requires them to be in different blocks.
 
-## Variables, parameters, and initial values
+The rule does not prohibit every cycle. Compatible even cycles are allowed;
+for example, the products `x * y`, `y * z`, `z * w`, and `w * x` admit the
+two-block assignment `{x, z}` and `{y, w}`.
+
+(supported-constraints)=
+### Supported CVXPY expressions and constraints
+
+DBCP must be able to copy each CVXPY expression while replacing either
+variable group with generated parameters. DPP is not required, although a
+non-DPP parameterization can make CVXPY canonicalize a subproblem again on
+each solve.
+
+The supported constraint families are:
+
+- equality and zero constraints;
+- scalar or elementwise inequalities, including nonnegative and nonpositive
+  constraints;
+- positive-semidefinite constraints; and
+- second-order-cone constraints.
+
+Other specialized CVXPY constraint objects are not currently transformed by
+DBCP.
+
+## Variable attributes and parameters
 
 CVXPY variable attributes such as `nonneg=True`, `nonpos=True`, symmetry, and
 positive semidefiniteness are copied to the generated fixed parameters. Native
@@ -97,7 +144,19 @@ constraints remain part of each applicable subproblem.
 Ordinary CVXPY parameters can be used as problem data and retain their normal
 CVXPY behavior. Give them numerical values before solving.
 
-An existing variable `.value` is used as an initial point. When a value is
-missing, DBCP draws a standard-normal array and projects it through the
-variable's CVXPY attributes. Assign all variable values explicitly when
-reproducible initialization is important.
+## Discrete convolution
+
+{func}`dbcp.convolve` constructs the full discrete convolution of two
+one-dimensional CVXPY expressions. For lengths $m$ and $n$, it returns an
+expression of length $m+n-1$ with
+
+$$
+c_k=\sum_{i+j=k}x_i y_j.
+$$
+
+When `x` and `y` belong to different variable blocks, the result is biaffine
+and is useful in models such as blind deconvolution. Both inputs must be
+one-dimensional; otherwise the helper raises `ValueError`.
+
+See {doc}`solving` for initialization, solve modes, and generated-subproblem
+inspection.

@@ -8,11 +8,11 @@ composition after the opposite variable block has been replaced by
 parameters. Check that the two supplied groups are disjoint and that every
 variable omitted from both can remain active in both subproblems. The groups
 need not be exhaustive. Also check that CVXPY knows any signs required by the
-composition rules.
+{ref}`product composition rules <product-compositions>`.
 
 The constructor itself can raise `TypeError` for a specialized constraint
-class that DBCP does not know how to copy. See {doc}`rules` for the supported
-families.
+class that DBCP does not know how to copy. See the {ref}`supported constraint
+families <supported-constraints>`.
 
 ## Feasible initialization fails
 
@@ -42,10 +42,9 @@ Calling `solve()` again continues from the current variable values.
 ## A penalty-mode result has excess slack
 
 Statuses ending in `_with_slack` mean the total absolute slack is greater than
-`slack_tol`. This does not establish that the original problem is infeasible.
-Inspect the original constraint residuals, then consider increasing the
-strictly positive `nu`, initializing closer to the original feasible set, or
-using another convex solver.
+`slack_tol`. Inspect the original constraint residuals, then consider increasing
+the strictly positive `nu`, initializing closer to the original feasible set,
+or using another convex solver.
 
 ## CVXPY reports a non-DPP or canonicalization-backend warning
 
@@ -56,9 +55,3 @@ canonicalization backend. These warnings concern compilation and performance;
 they do not by themselves mean that `is_dbcp()` should be false. Prefer an
 equivalent DPP formulation when one exists, and select a canonicalization
 backend explicitly only when that choice is intentional.
-
-## Convolution rejects its inputs
-
-{func}`dbcp.convolve` accepts only one-dimensional CVXPY expressions. Reshape
-vectors explicitly before calling it; matrices and higher-dimensional arrays
-raise `ValueError`.

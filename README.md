@@ -92,22 +92,28 @@ rng = np.random.default_rng(10015)
 m, n, k = 5, 10, 3
 A = rng.random((m, k)) @ rng.random((k, n))
 
-X = cp.Variable((m, k), nonneg=True, name="X")
-Y = cp.Variable((k, n), nonneg=True, name="Y")
+X = cp.Variable((m, k), name="X")
+Y = cp.Variable((k, n), name="Y")
 
 problem = dbcp.BiconvexProblem(
     cp.Minimize(cp.sum_squares(X @ Y - A)),
     [X],
     [Y],
+    [X >= 0, Y >= 0],
 )
 
 assert problem.is_dbcp()
 value = problem.solve()
 ```
 
-The two list arguments define the variable groups. DBCP alternately optimizes
-one group while holding the other fixed, and writes the result into the
-original CVXPY variables.
+The `[X]` and `[Y]` arguments supply the `x_var` and `y_var` variable groups,
+while the last argument encodes the nonnegativity constraints. DBCP alternately
+optimizes one group while holding the other fixed and writes the result into
+the original CVXPY variables.
+
+Because unset variables are initialized randomly, different starting points
+can produce different factorizations. Assign `X.value` and `Y.value` before
+`solve()` when a specific warm start is desired.
 
 ## Documentation
 

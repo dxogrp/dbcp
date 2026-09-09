@@ -2,8 +2,6 @@
 
 ## 1.0
 
-### 1.0.0
-
 - Changed the `BiconvexProblem` constructor to accept `x_var` and `y_var` as
   separate arguments. The constructor materializes the two iterables, verifies
   that every member is a problem variable, and rejects overlapping groups. The
@@ -27,9 +25,7 @@
   Penalty results whose total slack exceeds `slack_tol` now use the statuses
   `converge_with_slack` and `converge_inaccurate_with_slack`, replacing
   `converge_infeasible` and `converge_inaccurate_infeasible`. Equality with
-  `slack_tol` is accepted. A `_with_slack` status describes the returned
-  relaxed point and does not establish that the original problem is
-  infeasible.
+  `slack_tol` is accepted.
 
   `BiconvexRelaxProblem` has been removed from the public API. Constructing the
   migration stub raises this error: `'BiconvexRelaxProblem' was removed; use

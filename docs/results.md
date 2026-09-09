@@ -17,8 +17,7 @@ print(y.value)
 `problem.value` is the original modeled objective evaluated at the final
 variables. It excludes the proximal term and, for `mode="penalty"`, the slack
 penalty. When the status ends in `_with_slack`, this value is evaluated at a
-point whose final total slack exceeds `slack_tol` and should not be interpreted
-as the objective value of a certified feasible point.
+point whose final total slack exceeds `slack_tol`.
 
 ## Direct-mode statuses
 
@@ -60,12 +59,8 @@ as the objective value of a certified feasible point.
 ```
 
 A penalty-mode status ending in `_with_slack` also emits a warning with the
-final total slack and `slack_tol`. This status describes the returned relaxed
-point; it does not establish that the original problem is infeasible. Increasing
-`nu`, improving the initial values, or using another convex solver can reduce
-the slack. Conversely, a penalty-mode status without `_with_slack` means only
-that the final total slack is at or below `slack_tol`; it does not certify exact
-feasibility for the original constraints.
+final total slack and `slack_tol`. Increasing `nu`, improving the initial
+values, or using another convex solver can reduce the slack.
 
 See {doc}`solving` for the ACS algorithm and the interpretation of its
 objective-gap stopping test.
