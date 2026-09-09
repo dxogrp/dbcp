@@ -1,9 +1,15 @@
 [
   {
     "name": "latest",
-    "version": "0.2",
+    "version": "1.0",
     "url": "https://dxogrp.github.io/dbcp/",
     "preferred": true
+  },
+  {
+    "name": "1.0",
+    "version": "1.0",
+    "url": "https://dxogrp.github.io/dbcp/version/1.0/",
+    "preferred": false
   },
   {
     "name": "0.2",
