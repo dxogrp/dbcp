@@ -97,6 +97,8 @@ def test_readme_quickstart_constructs_without_running_a_numerical_solve(monkeypa
 
     problem = namespace["problem"]
     assert isinstance(problem, dbcp.BiconvexProblem)
+    assert all(variable.value is not None for variable in problem.variables())
+    assert all(constraint.value() for constraint in problem.constraints)
     assert problem.is_dbcp()
     assert calls == [(problem, (), {})]
 

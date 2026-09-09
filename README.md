@@ -94,6 +94,8 @@ A = rng.random((m, k)) @ rng.random((k, n))
 
 X = cp.Variable((m, k), name="X")
 Y = cp.Variable((k, n), name="Y")
+X.value = rng.random(X.shape)
+Y.value = rng.random(Y.shape)
 
 problem = dbcp.BiconvexProblem(
     cp.Minimize(cp.sum_squares(X @ Y - A)),
