@@ -420,17 +420,17 @@ class BiconvexProblem(cp.Problem):
                     rel_tol,
                 ):
                     if is_penalty:
-                        self._status = "converge_with_slack" if has_excess_slack else "converge"
+                        self._status = "converged_with_slack" if has_excess_slack else "converged"
                     else:
-                        self._status = "converge"
+                        self._status = "converged"
                     break
                 else:
                     i += 1
                 if i == max_iter:
                     if is_penalty:
-                        self._status = "converge_inaccurate_with_slack" if has_excess_slack else "converge_inaccurate"
+                        self._status = "converged_inaccurate_with_slack" if has_excess_slack else "converged_inaccurate"
                     else:
-                        self._status = "converge_inaccurate"
+                        self._status = "converged_inaccurate"
                     break
         except cp.SolverError as e:
             raise SolveError("Solver failed. Try with larger 'lbd' value.") from e

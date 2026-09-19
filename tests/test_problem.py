@@ -265,7 +265,7 @@ def test_biconvex_problem_solves_with_scale_aware_tolerances():
     )
 
     assert value is not None
-    assert problem.status == "converge"
+    assert problem.status == "converged"
 
 
 def test_direct_initialization_preserves_problem_parameters():
@@ -324,7 +324,7 @@ def test_penalty_inspection_properties_are_lazy_and_stable(monkeypatch):
 
     assert calls == 1
     assert value is not None
-    assert problem.status == "converge"
+    assert problem.status == "converged"
     assert value == problem.objective.value
     assert len(penalty_prob.parameters()) == 1
     assert penalty_prob.parameters()[0].value == 1
@@ -337,13 +337,13 @@ def test_penalty_inspection_properties_are_lazy_and_stable(monkeypatch):
 @pytest.mark.parametrize(
     ("positive_slack", "gap_within_tolerance", "expected_status"),
     [
-        pytest.param(False, True, "converge", id="zero-slack-converged"),
-        pytest.param(False, False, "converge_inaccurate", id="zero-slack-max-iterations"),
-        pytest.param(True, True, "converge_with_slack", id="excess-slack-converged"),
+        pytest.param(False, True, "converged", id="zero-slack-converged"),
+        pytest.param(False, False, "converged_inaccurate", id="zero-slack-max-iterations"),
+        pytest.param(True, True, "converged_with_slack", id="excess-slack-converged"),
         pytest.param(
             True,
             False,
-            "converge_inaccurate_with_slack",
+            "converged_inaccurate_with_slack",
             id="excess-slack-max-iterations",
         ),
     ],
@@ -408,7 +408,7 @@ def test_penalty_status_allows_positive_slack_within_tolerance():
     ]
 
     assert 0 < total_slack <= 2.0
-    assert problem.status == "converge"
+    assert problem.status == "converged"
     assert not slack_warnings
 
 
@@ -416,7 +416,7 @@ def test_penalty_status_allows_positive_slack_within_tolerance():
 def test_penalty_mode_rejects_nonfinite_computed_total_slack(monkeypatch, nonfinite_slack):
     problem = _make_unconstrained_problem()
     problem.solve(cp.CLARABEL, abs_tol=1e6, mode="penalty")
-    assert problem.status == "converge"
+    assert problem.status == "converged"
     assert problem.value is not None
 
     monkeypatch.setattr(
@@ -486,7 +486,7 @@ def test_failed_direct_solve_can_retry_with_penalty_mode():
         )
 
     assert value is not None
-    assert problem.status == "converge_with_slack"
+    assert problem.status == "converged_with_slack"
 
 
 @pytest.mark.parametrize("mode", ["relaxed", "DIRECT", None, 1])
@@ -574,7 +574,7 @@ def test_problem_can_switch_modes_and_update_penalty():
     assert penalty_parameter.value == 3
 
     problem.solve(cp.CLARABEL, abs_tol=1e6, mode="direct")
-    assert problem.status == "converge"
+    assert problem.status == "converged"
 
 
 def test_cvxpy_custom_solve_method_is_forwarded_to_alternating_subproblems(monkeypatch):

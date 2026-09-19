@@ -44,7 +44,7 @@ def _smoke_biconvex_problem() -> None:
         ignore_dpp=True,
     )
     values = _solution_values(result, x, y)
-    if problem.status != "converge" or abs(values[-1]) > 1e-8:
+    if problem.status != "converged" or abs(values[-1]) > 1e-8:
         raise RuntimeError(f"Biconvex release smoke solve failed: status={problem.status!r}, values={values}.")
 
 
@@ -88,7 +88,7 @@ def _smoke_biconvex_penalty_mode() -> None:
         raise RuntimeError("Penalty-mode release smoke solve did not return every slack value.")
     total_slack = sum(float(np.sum(np.abs(slack.value))) for slack in slack_vars)
     if (
-        problem.status != "converge"
+        problem.status != "converged"
         or abs(values[-1]) > 1e-8
         or values[0] * values[1] < 0.5 - slack_tol
         or total_slack > slack_tol
