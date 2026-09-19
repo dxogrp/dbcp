@@ -137,7 +137,7 @@ each alternating CVXPY subproblem solve, but not to the auxiliary direct-mode
 feasibility solves.
 
 Note that alternating convex search is a local heuristic. Its objective-gap
-stopping test, including a `converge` status, is **not** a certificate of
+stopping test, including a `converged` status, is **not** a certificate of
 global optimality.
 
 ## Inspecting generated subproblems

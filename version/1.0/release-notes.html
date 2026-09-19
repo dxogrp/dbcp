@@ -63,7 +63,7 @@
 <li class="toctree-l1"><a class="reference internal" href="api.html">API reference</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Release notes</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#id1">1.0</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id2">0.2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id4">0.2</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="cite.html">Citing</a></li>
@@ -106,6 +106,15 @@
 <h1>Release notes<a class="headerlink" href="#release-notes" title="Link to this heading">¶</a></h1>
 <section id="id1">
 <h2>1.0<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
+<section id="id2">
+<h3>1.0.1<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Renamed solution statuses to use <code class="docutils literal notranslate"><span class="pre">converged</span></code> instead of <code class="docutils literal notranslate"><span class="pre">converge</span></code>. Callers
+comparing <code class="docutils literal notranslate"><span class="pre">BiconvexProblem.status</span></code> strings should update accordingly.</p></li>
+</ul>
+</section>
+<section id="id3">
+<h3>1.0.0<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h3>
 <ul>
 <li><p>Changed the <code class="docutils literal notranslate"><span class="pre">BiconvexProblem</span></code> constructor to accept <code class="docutils literal notranslate"><span class="pre">x_var</span></code> and <code class="docutils literal notranslate"><span class="pre">y_var</span></code> as
 separate arguments. The constructor materializes the two iterables, verifies
@@ -151,8 +160,9 @@ arguments. Setting <code class="docutils literal notranslate"><span class="pre">
 </li>
 </ul>
 </section>
-<section id="id2">
-<h2>0.2<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+</section>
+<section id="id4">
+<h2>0.2<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h2>
 <p>The prototype series provided <code class="docutils literal notranslate"><span class="pre">BiconvexProblem</span></code> for direct alternating solves,
 <code class="docutils literal notranslate"><span class="pre">BiconvexRelaxProblem</span></code> for slack-relaxed solves, and <code class="docutils literal notranslate"><span class="pre">convolve</span></code> for biconvex
 convolution expressions.</p>

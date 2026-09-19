@@ -520,17 +520,17 @@
                     <span class="n">rel_tol</span><span class="p">,</span>
                 <span class="p">):</span>
                     <span class="k">if</span> <span class="n">is_penalty</span><span class="p">:</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">_status</span> <span class="o">=</span> <span class="s2">&quot;converge_with_slack&quot;</span> <span class="k">if</span> <span class="n">has_excess_slack</span> <span class="k">else</span> <span class="s2">&quot;converge&quot;</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_status</span> <span class="o">=</span> <span class="s2">&quot;converged_with_slack&quot;</span> <span class="k">if</span> <span class="n">has_excess_slack</span> <span class="k">else</span> <span class="s2">&quot;converged&quot;</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">_status</span> <span class="o">=</span> <span class="s2">&quot;converge&quot;</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_status</span> <span class="o">=</span> <span class="s2">&quot;converged&quot;</span>
                     <span class="k">break</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
                 <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">max_iter</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">is_penalty</span><span class="p">:</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">_status</span> <span class="o">=</span> <span class="s2">&quot;converge_inaccurate_with_slack&quot;</span> <span class="k">if</span> <span class="n">has_excess_slack</span> <span class="k">else</span> <span class="s2">&quot;converge_inaccurate&quot;</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_status</span> <span class="o">=</span> <span class="s2">&quot;converged_inaccurate_with_slack&quot;</span> <span class="k">if</span> <span class="n">has_excess_slack</span> <span class="k">else</span> <span class="s2">&quot;converged_inaccurate&quot;</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">_status</span> <span class="o">=</span> <span class="s2">&quot;converge_inaccurate&quot;</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_status</span> <span class="o">=</span> <span class="s2">&quot;converged_inaccurate&quot;</span>
                     <span class="k">break</span>
         <span class="k">except</span> <span class="n">cp</span><span class="o">.</span><span class="n">SolverError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">SolveError</span><span class="p">(</span><span class="s2">&quot;Solver failed. Try with larger &#39;lbd&#39; value.&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>

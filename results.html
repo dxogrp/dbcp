@@ -133,11 +133,11 @@ point whose final total slack exceeds <code class="docutils literal notranslate"
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">converge</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">converged</span></code></p></td>
 <td><p>The gap between the final x- and y-subproblem objective values satisfies
 the combined <code class="docutils literal notranslate"><span class="pre">abs_tol</span></code> and <code class="docutils literal notranslate"><span class="pre">rel_tol</span></code> stopping test.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">converge_inaccurate</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">converged_inaccurate</span></code></p></td>
 <td><p>The solve reached <code class="docutils literal notranslate"><span class="pre">max_iter</span></code> before that objective gap satisfied the
 combined stopping test.</p></td>
 </tr>
@@ -157,20 +157,20 @@ combined stopping test.</p></td>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">converge</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">converged</span></code></p></td>
 <td><p>The slack-penalized subproblem objective gap satisfies the combined
 absolute-and-relative stopping test and total slack is at or below
 <code class="docutils literal notranslate"><span class="pre">slack_tol</span></code>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">converge_with_slack</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">converged_with_slack</span></code></p></td>
 <td><p>The slack-penalized subproblem objective gap satisfies the combined
 stopping test, but the final total slack is above <code class="docutils literal notranslate"><span class="pre">slack_tol</span></code>.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">converge_inaccurate</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">converged_inaccurate</span></code></p></td>
 <td><p>The iteration limit was reached before the slack-penalized objective gap
 met its combined tolerance, but total slack is at or below <code class="docutils literal notranslate"><span class="pre">slack_tol</span></code>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">converge_inaccurate_with_slack</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">converged_inaccurate_with_slack</span></code></p></td>
 <td><p>The iteration limit was reached before the slack-penalized objective gap
 met its combined tolerance, and total slack remains above <code class="docutils literal notranslate"><span class="pre">slack_tol</span></code>.</p></td>
 </tr>

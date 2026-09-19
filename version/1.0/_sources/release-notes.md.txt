@@ -2,6 +2,13 @@
 
 ## 1.0
 
+### 1.0.1
+
+- Renamed solution statuses to use `converged` instead of `converge`. Callers
+  comparing `BiconvexProblem.status` strings should update accordingly.
+
+### 1.0.0
+
 - Changed the `BiconvexProblem` constructor to accept `x_var` and `y_var` as
   separate arguments. The constructor materializes the two iterables, verifies
   that every member is a problem variable, and rejects overlapping groups. The

@@ -27,10 +27,10 @@ point whose final total slack exceeds `slack_tol`.
 
 * - Status
   - Meaning
-* - `converge`
+* - `converged`
   - The gap between the final x- and y-subproblem objective values satisfies
     the combined `abs_tol` and `rel_tol` stopping test.
-* - `converge_inaccurate`
+* - `converged_inaccurate`
   - The solve reached `max_iter` before that objective gap satisfied the
     combined stopping test.
 ```
@@ -43,17 +43,17 @@ point whose final total slack exceeds `slack_tol`.
 
 * - Status
   - Meaning
-* - `converge`
+* - `converged`
   - The slack-penalized subproblem objective gap satisfies the combined
     absolute-and-relative stopping test and total slack is at or below
     `slack_tol`.
-* - `converge_with_slack`
+* - `converged_with_slack`
   - The slack-penalized subproblem objective gap satisfies the combined
     stopping test, but the final total slack is above `slack_tol`.
-* - `converge_inaccurate`
+* - `converged_inaccurate`
   - The iteration limit was reached before the slack-penalized objective gap
     met its combined tolerance, but total slack is at or below `slack_tol`.
-* - `converge_inaccurate_with_slack`
+* - `converged_inaccurate_with_slack`
   - The iteration limit was reached before the slack-penalized objective gap
     met its combined tolerance, and total slack remains above `slack_tol`.
 ```

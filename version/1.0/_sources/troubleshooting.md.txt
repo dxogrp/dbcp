@@ -31,7 +31,7 @@ to strengthen the proximal regularization.
 
 ## The solve reaches the iteration limit
 
-`converge_inaccurate` and `converge_inaccurate_with_slack` mean the
+`converged_inaccurate` and `converged_inaccurate_with_slack` mean the
 objective-gap stopping test was not met within `max_iter`. The `_with_slack`
 suffix additionally means that the final total slack exceeds `slack_tol`.
 Inspect the variable values and objective, then consider another starting
