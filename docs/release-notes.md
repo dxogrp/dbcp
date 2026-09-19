@@ -2,6 +2,17 @@
 
 ## 1.0
 
+## 1.0.1
+
+- Corrected the four public solution-status values to use the past-tense
+  `converged` stem. Replace `converge`, `converge_with_slack`,
+  `converge_inaccurate`, and `converge_inaccurate_with_slack` with
+  `converged`, `converged_with_slack`, `converged_inaccurate`, and
+  `converged_inaccurate_with_slack`, respectively. The former values are no
+  longer returned.
+
+### 1.0.0
+
 - Changed the `BiconvexProblem` constructor to accept `x_var` and `y_var` as
   separate arguments. The constructor materializes the two iterables, verifies
   that every member is a problem variable, and rejects overlapping groups. The
