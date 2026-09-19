@@ -2,14 +2,10 @@
 
 ## 1.0
 
-## 1.0.1
+### 1.0.1
 
-- Corrected the four public solution-status values to use the past-tense
-  `converged` stem. Replace `converge`, `converge_with_slack`,
-  `converge_inaccurate`, and `converge_inaccurate_with_slack` with
-  `converged`, `converged_with_slack`, `converged_inaccurate`, and
-  `converged_inaccurate_with_slack`, respectively. The former values are no
-  longer returned.
+- Renamed solution statuses to use `converged` instead of `converge`. Callers
+  comparing `BiconvexProblem.status` strings should update accordingly.
 
 ### 1.0.0
 

@@ -268,6 +268,16 @@ def test_biconvex_problem_solves_with_scale_aware_tolerances():
     assert problem.status == "converged"
 
 
+def test_direct_status_reports_inaccurate_at_iteration_limit(monkeypatch):
+    problem = _make_unconstrained_problem()
+    monkeypatch.setattr(problem_module, "_objective_gap_within_tolerance", lambda *_args: False)
+
+    value = problem.solve(cp.CLARABEL, max_iter=1)
+
+    assert value is not None
+    assert problem.status == "converged_inaccurate"
+
+
 def test_direct_initialization_preserves_problem_parameters():
     lower_bound = cp.Parameter(value=1.0)
     x = cp.Variable()
